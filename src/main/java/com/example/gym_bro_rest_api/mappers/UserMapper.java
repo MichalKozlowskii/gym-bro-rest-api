@@ -5,4 +5,6 @@ import com.example.gym_bro_rest_api.entities.User;
 
 public interface UserMapper {
     User UserDtoToUser(UserDTO userDTO);
+
+    UserDTO UserToUserDto(User user);
 }

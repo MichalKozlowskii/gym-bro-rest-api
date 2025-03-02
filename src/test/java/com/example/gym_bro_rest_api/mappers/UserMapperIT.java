@@ -30,4 +30,19 @@ class UserMapperIT {
         assertThat(user.getPassword()).isNotEqualTo("password");
         assertThat(passwordEncoder.matches("password", user.getPassword())).isTrue();
     }
+
+    @Test
+    void testUserToUserDTO() {
+        User user = User.builder()
+                .username("user1")
+                .password("encryptedPassword")
+                .build();
+
+        // Act
+        UserDTO userDTO = userMapper.UserToUserDto(user);
+
+        // Assert
+        assertThat(userDTO.getUsername()).isEqualTo("user1");
+        assertThat(userDTO.getPassword()).isEqualTo("encryptedPassword");
+    }
 }
