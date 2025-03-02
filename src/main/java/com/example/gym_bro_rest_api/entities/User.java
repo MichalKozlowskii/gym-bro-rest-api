@@ -1,6 +1,9 @@
 package com.example.gym_bro_rest_api.entities;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -20,17 +23,21 @@ public class User implements UserDetails {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique = true, nullable = false)
+    @Column(unique = true)
+    @NotNull
+    @NotBlank
     private String username;
 
-    @Column(nullable = false)
+    @NotNull
+    @NotBlank
+    @Size(min = 7)
     private String password;
 
-    private boolean enabled = true; // User activation control
+    private boolean enabled = true;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(); // Implement roles if needed
+        return List.of();
     }
 
     @Override
