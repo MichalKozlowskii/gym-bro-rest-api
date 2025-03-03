@@ -1,5 +1,6 @@
 package com.example.gym_bro_rest_api.security;
 
+import com.example.gym_bro_rest_api.config.SecurityConfig;
 import com.example.gym_bro_rest_api.services.CustomUserDetailsService;
 import com.example.gym_bro_rest_api.services.JwtService;
 import jakarta.servlet.FilterChain;
@@ -26,11 +27,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtService jwtService;
     private final CustomUserDetailsService userDetailsService;
 
-    private static final List<String> EXCLUDED_PATHS = List.of("/api/login", "/api/register");
-
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
-        return EXCLUDED_PATHS.contains(request.getServletPath());
+        return SecurityConfig.EXCLUDED_PATHS.contains(request.getServletPath());
     }
 
     @Override
