@@ -1,4 +1,4 @@
-package com.example.gym_bro_rest_api.dto;
+package com.example.gym_bro_rest_api.model;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
