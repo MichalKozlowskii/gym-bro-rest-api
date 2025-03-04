@@ -23,6 +23,8 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         String githubUsername = oAuth2User.getAttribute("login");
 
         String token = jwtService.generateToken(githubUsername);
-        response.sendRedirect("http://localhost:3000/oauth-success?token=" + token);
+
+        String redirectUrl = "http://localhost:8080/api/oauth-success?token=" + token;
+        getRedirectStrategy().sendRedirect(request, response, redirectUrl);
     }
 }

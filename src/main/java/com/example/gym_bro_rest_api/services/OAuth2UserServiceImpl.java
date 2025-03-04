@@ -14,11 +14,12 @@ import java.util.Base64;
 @RequiredArgsConstructor
 public class OAuth2UserServiceImpl implements OAuth2UserService {
     private final UserRepository userRepository;
+    private final JwtService jwtService;
     private final PasswordEncoder passwordEncoder;
 
     @Override
-    public User processOAuthPostLogin(OAuth2User oAuth2User) {
-        String username = oAuth2User.getAttribute("login");
+    public User processOAuthPostLogin(String jwtKey) {
+        String username = jwtService.extractUsername(jwtKey);
 
         User user = userRepository.findByUsername(username).orElse(null);
 
@@ -29,6 +30,7 @@ public class OAuth2UserServiceImpl implements OAuth2UserService {
             user = userRepository.save(User.builder()
                     .username(username)
                     .password(hashedPassword)
+                    .enabled(true)
                     .build());
         }
 

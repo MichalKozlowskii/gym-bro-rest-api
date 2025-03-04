@@ -25,7 +25,13 @@ public class SecurityConfig {
     private final CustomUserDetailsService userDetailsService;
     private final OAuth2SuccessHandler oAuth2SuccessHandler;
 
-    public static final List<String> EXCLUDED_PATHS = List.of("/api/login", "/api/register", "/oauth2/**");
+    public static final List<String> EXCLUDED_PATHS = List.of(
+            "/api/login",
+            "/api/register",
+            "/oauth2/**",
+            "/h2-console/**",
+            "/api/oauth-success"
+    );
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -38,8 +44,10 @@ public class SecurityConfig {
                 )
                 .oauth2Login(oauth2 -> oauth2
                         .successHandler(oAuth2SuccessHandler)
+                        .authorizationEndpoint(endpoint -> endpoint.baseUri("/api/login/github"))
                 )
-                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
+                .headers().frameOptions().disable();
         return http.build();
     }
     @Bean
