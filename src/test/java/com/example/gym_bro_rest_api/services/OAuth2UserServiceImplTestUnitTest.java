@@ -23,7 +23,7 @@ class OAuth2UserServiceImplTestUnitTest {
     @Mock
     private PasswordEncoder passwordEncoder;
     @Mock
-    private OAuth2User oAuth2User;
+    private JwtService jwtService;
     @InjectMocks
     private OAuth2UserServiceImpl oAuth2UserService;
 
@@ -37,12 +37,12 @@ class OAuth2UserServiceImplTestUnitTest {
         String githubUsername = "newUser";
         String encodedPassword = "hashedPassword123";
 
-        when(oAuth2User.getAttribute("login")).thenReturn(githubUsername);
-        when(userRepository.findByUsername(githubUsername)).thenReturn(Optional.empty());
+        when(jwtService.extractUsername(anyString())).thenReturn(githubUsername);
+        when(userRepository.findByUsername(anyString())).thenReturn(Optional.empty());
         when(passwordEncoder.encode(anyString())).thenReturn(encodedPassword);
         when(userRepository.save(any(User.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        User createdUser = oAuth2UserService.processOAuthPostLogin(oAuth2User);
+        User createdUser = oAuth2UserService.processOAuthPostLogin("321412421sd");
 
         assertNotNull(createdUser);
         assertEquals(githubUsername, createdUser.getUsername());
@@ -56,10 +56,10 @@ class OAuth2UserServiceImplTestUnitTest {
         String githubUsername = "existingUser";
         User existingUser = User.builder().username(githubUsername).password("existingPassword").build();
 
-        when(oAuth2User.getAttribute("login")).thenReturn(githubUsername);
+        when(jwtService.extractUsername(anyString())).thenReturn(githubUsername);
         when(userRepository.findByUsername(githubUsername)).thenReturn(Optional.of(existingUser));
 
-        User returnedUser = oAuth2UserService.processOAuthPostLogin(oAuth2User);
+        User returnedUser = oAuth2UserService.processOAuthPostLogin("1342141241");
 
         assertNotNull(returnedUser);
         assertEquals(githubUsername, returnedUser.getUsername());
