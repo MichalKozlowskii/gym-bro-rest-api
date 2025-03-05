@@ -61,7 +61,7 @@ public class AuthController {
                     .body(Map.of("error", "Password must have at least 7 characters."));
         }
 
-        //userService.saveNewUser(userDTO);
+        userService.saveNewUser(userDTO);
 
         return ResponseEntity.status(HttpStatus.CREATED)
                 .header("login-url", "/api/login")
