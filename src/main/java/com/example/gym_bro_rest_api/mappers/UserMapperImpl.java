@@ -20,6 +20,7 @@ public class UserMapperImpl implements UserMapper {
                 .id(userDTO.getId())
                 .username(userDTO.getUsername())
                 .password(passwordEncoder.encode(userDTO.getPassword()))
+                .enabled(true)
                 .build();
     }
 
