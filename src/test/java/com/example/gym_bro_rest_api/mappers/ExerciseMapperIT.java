@@ -3,29 +3,13 @@ package com.example.gym_bro_rest_api.mappers;
 import com.example.gym_bro_rest_api.entities.Exercise;
 import com.example.gym_bro_rest_api.entities.User;
 import com.example.gym_bro_rest_api.model.ExerciseDTO;
-import com.example.gym_bro_rest_api.repositories.UserRepository;
-import jakarta.transaction.Transactional;
-import lombok.extern.slf4j.Slf4j;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mapstruct.factory.Mappers;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.boot.test.mock.mockito.MockBean;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.when;
 
-@ExtendWith(MockitoExtension.class)
-@Slf4j
 class ExerciseMapperIT {
     private final ExerciseMapper exerciseMapper = Mappers.getMapper(ExerciseMapper.class);
-
-    @Mock
-    private UserRepository userRepository;
 
     private User testUser = User.builder()
             .id(1L)
