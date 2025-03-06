@@ -74,12 +74,4 @@ public class AuthController {
 
         return ResponseEntity.ok(Map.of("jwt_token", token));
     }
-
-    @GetMapping("/test")
-    public ResponseEntity<String> testAuth(@AuthenticationPrincipal User user) {
-        String username = user.getUsername();
-
-        // Return a response with the authenticated user's username
-        return ResponseEntity.ok("Authenticated as: " + username);
-    }
 }
