@@ -8,6 +8,8 @@ import com.example.gym_bro_rest_api.repositories.ExerciseRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 public class ExerciseServiceImpl implements ExerciseService {
@@ -23,4 +25,12 @@ public class ExerciseServiceImpl implements ExerciseService {
 
         return exerciseMapper.exerciseToExerciseDto(exerciseRepository.save(exercise));
     }
+
+    @Override
+    public Optional<ExerciseDTO> getExerciseById(Long id) {
+        return exerciseRepository.findById(id)
+                .map(exerciseMapper::exerciseToExerciseDto);
+    }
+
+
 }
