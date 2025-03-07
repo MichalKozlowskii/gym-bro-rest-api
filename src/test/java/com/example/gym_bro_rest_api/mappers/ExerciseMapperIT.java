@@ -34,23 +34,4 @@ class ExerciseMapperIT {
         assertThat(exerciseDTO.getId()).isEqualTo(exercise.getId());
         assertThat(exerciseDTO.getUserId()).isNotNull();
     }
-
-    @Test
-    void testExerciseDtoToExercise() {
-        ExerciseDTO exerciseDTO = ExerciseDTO.builder()
-                .id(1L)
-                .name("exercise 1")
-                .demonstrationUrl("dsadsad")
-                .userId(1L)
-                .build();
-
-        Exercise exercise = exerciseMapper.exerciseDtoToExercise(exerciseDTO);
-
-        assertThat(exercise.getName()).isEqualTo("exercise 1");
-        assertThat(exercise.getDemonstrationUrl()).isEqualTo(exerciseDTO.getDemonstrationUrl());
-        assertThat(exercise.getId()).isEqualTo(exerciseDTO.getId());
-        assertThat(exercise.getUser()).isNotNull();
-        assertThat(exercise.getUser()).isInstanceOfAny(User.class);
-        assertThat(exercise.getUser().getId()).isEqualTo(exerciseDTO.getUserId());
-    }
 }

@@ -7,9 +7,6 @@ import org.mapstruct.Mapping;
 
 @Mapper
 public interface ExerciseMapper {
-
     @Mapping(source = "user.id", target = "userId")
     ExerciseDTO exerciseToExerciseDto(Exercise exercise);
-    @Mapping(source = "userId", target = "user.id")
-    Exercise exerciseDtoToExercise(ExerciseDTO exerciseDTO);
 }
