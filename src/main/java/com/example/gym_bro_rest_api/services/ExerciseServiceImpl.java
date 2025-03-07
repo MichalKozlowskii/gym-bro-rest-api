@@ -13,8 +13,8 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class ExerciseServiceImpl implements ExerciseService {
-    ExerciseRepository exerciseRepository;
-    ExerciseMapper exerciseMapper;
+    private final ExerciseRepository exerciseRepository;
+    private final ExerciseMapper exerciseMapper;
     @Override
     public ExerciseDTO saveNewExercise(ExerciseDTO exerciseDTO, User user) {
         Exercise exercise = Exercise.builder()
