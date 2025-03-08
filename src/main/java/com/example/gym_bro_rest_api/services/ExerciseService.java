@@ -8,4 +8,5 @@ import java.util.Optional;
 public interface ExerciseService {
     ExerciseDTO saveNewExercise(ExerciseDTO exerciseDTO, User user);
     Optional<ExerciseDTO> getExerciseById(Long id);
+    Optional<ExerciseDTO> updateExerciseById(Long id, ExerciseDTO exerciseDTO, User user);
 }

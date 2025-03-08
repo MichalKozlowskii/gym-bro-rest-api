@@ -46,4 +46,21 @@ public class ExerciseController {
 
         return exerciseDTO;
     }
+
+    @PutMapping("{exerciseId}")
+    ResponseEntity<Map<String, String>> updateExerciseById(@PathVariable("exerciseId") Long id,
+                                                           @RequestBody ExerciseDTO exerciseDTO,
+                                                           @AuthenticationPrincipal User user) {
+        if (exerciseDTO.getName().isBlank() || exerciseDTO.getName().isEmpty()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("error", "Exercise name can't be blank or empty."));
+        }
+
+        ExerciseDTO updatedDTO = exerciseService.updateExerciseById(id, exerciseDTO, user)
+                .orElseThrow(NotFoundException::new);
+        
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(Map.of("success", "Exercise updated."));
+    }
+
 }

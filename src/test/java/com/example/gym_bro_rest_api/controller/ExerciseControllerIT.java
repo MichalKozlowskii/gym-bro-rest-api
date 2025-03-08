@@ -58,6 +58,72 @@ class ExerciseControllerIT {
     }
 
     @Test
+    void testUpdateExerciseById_NoAccess() {
+        Exercise existing = saveTestExercise();
+
+        ExerciseDTO updateDto = ExerciseDTO.builder()
+                .name("2")
+                .demonstrationUrl("fakpofkaepof")
+                .build();
+
+        assertThrows(NoAccessException.class, () -> {
+           exerciseController.updateExerciseById(existing.getId(), updateDto, user2);
+        });
+    }
+
+    @Test
+    void testUpdateExerciseById_NotFound() {
+        ExerciseDTO updateDto = ExerciseDTO.builder()
+                .name("2")
+                .demonstrationUrl("fakpofkaepof")
+                .build();
+
+        assertThrows(NotFoundException.class, () -> {
+            exerciseController.updateExerciseById(1321049L, updateDto, user1);
+        });
+    }
+
+    @Test
+    void testUpdateExerciseById_BadName() {
+        Exercise existing = saveTestExercise();
+
+        ExerciseDTO updateDto = ExerciseDTO.builder()
+                .name(" ")
+                .demonstrationUrl("fakpofkaepof")
+                .build();
+
+        ResponseEntity response = exerciseController.updateExerciseById(existing.getId(), updateDto, user1);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(response.getBody()).isNotNull();
+
+        Exercise updated = exerciseRepository.findById(existing.getId()).orElse(null);
+
+        assertThat(updated.getName()).isEqualTo(existing.getName());
+        assertThat(updated.getDemonstrationUrl()).isEqualTo(existing.getDemonstrationUrl());
+    }
+
+    @Test
+    void testUpdateExerciseById() {
+        Exercise existing = saveTestExercise();
+
+        ExerciseDTO updateDto = ExerciseDTO.builder()
+                .name("2")
+                .demonstrationUrl("fakpofkaepof")
+                .build();
+
+        ResponseEntity response = exerciseController.updateExerciseById(existing.getId(), updateDto, user1);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).isNotNull();
+
+        Exercise updated = exerciseRepository.findById(existing.getId()).orElse(null);
+
+        assertThat(updated.getName()).isEqualTo(updateDto.getName());
+        assertThat(updated.getDemonstrationUrl()).isEqualTo(updateDto.getDemonstrationUrl());
+    }
+
+    @Test
     void testGetExerciseById_NoAccess() {
         Exercise exercise = saveTestExercise();
         assertThrows(NoAccessException.class, () -> {
