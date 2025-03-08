@@ -47,7 +47,7 @@ public class ExerciseController {
         return exerciseDTO;
     }
 
-    @PutMapping("{exerciseId}")
+    @PutMapping("/{exerciseId}")
     ResponseEntity<Map<String, String>> updateExerciseById(@PathVariable("exerciseId") Long id,
                                                            @RequestBody ExerciseDTO exerciseDTO,
                                                            @AuthenticationPrincipal User user) {
@@ -62,7 +62,7 @@ public class ExerciseController {
                 .body(Map.of("success", "Exercise updated."));
     }
 
-    @DeleteMapping("{exerciseId}")
+    @DeleteMapping("/{exerciseId}")
     ResponseEntity<Map<String, String>> deleteExerciseById(@PathVariable("exerciseId") Long id,
                                                            @AuthenticationPrincipal User user) {
         exerciseService.deleteExerciseById(id, user.getId());
