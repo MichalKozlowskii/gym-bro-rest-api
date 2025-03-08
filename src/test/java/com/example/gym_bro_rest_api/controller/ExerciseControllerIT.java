@@ -59,7 +59,7 @@ class ExerciseControllerIT {
     }
 
     @Test
-x    void testListExercisesOfUser_Limit() {
+    void testListExercisesOfUser_Limit() {
         for (int i = 0; i < 1001; i++) {
             saveTestExercise();
         }
