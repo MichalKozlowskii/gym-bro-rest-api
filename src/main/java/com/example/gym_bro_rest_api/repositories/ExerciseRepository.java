@@ -8,4 +8,5 @@ import java.util.Optional;
 
 public interface ExerciseRepository extends JpaRepository<Exercise, Long> {
     List<Exercise> findExercisesByUserId(Long id);
+    Boolean existsByIdAndUserId(Long id, Long userId);
 }

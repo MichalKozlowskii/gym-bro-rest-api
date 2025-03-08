@@ -1,6 +1,7 @@
 package com.example.gym_bro_rest_api.services;
 
 import com.example.gym_bro_rest_api.controller.NoAccessException;
+import com.example.gym_bro_rest_api.controller.NotFoundException;
 import com.example.gym_bro_rest_api.entities.Exercise;
 import com.example.gym_bro_rest_api.entities.User;
 import com.example.gym_bro_rest_api.mappers.ExerciseMapper;
@@ -48,5 +49,18 @@ public class ExerciseServiceImpl implements ExerciseService {
 
             return exerciseMapper.exerciseToExerciseDto(exercise);
         });
+    }
+
+    @Override
+    public void deleteExerciseById(Long id, Long userId) {
+        if (!exerciseRepository.existsById(id)) {
+            throw new NotFoundException();
+        }
+
+        if (!exerciseRepository.existsByIdAndUserId(id, userId)) {
+            throw new NoAccessException();
+        }
+
+        exerciseRepository.deleteById(id);
     }
 }

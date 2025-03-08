@@ -58,6 +58,34 @@ class ExerciseControllerIT {
     }
 
     @Test
+    void testDeleteExerciseById_NoAccess() {
+        Exercise exercise = saveTestExercise();
+
+        assertThrows(NoAccessException.class, () -> {
+           exerciseController.deleteExerciseById(exercise.getId(), user2);
+        });
+    }
+
+    @Test
+    void testDeleteExerciseById_NotFound() {
+        assertThrows(NotFoundException.class, () -> {
+           exerciseController.deleteExerciseById(1321414L, user1);
+        });
+    }
+
+    @Test
+    void testDeleteExerciseById() {
+        Exercise existing = saveTestExercise();
+
+        ResponseEntity response = exerciseController.deleteExerciseById(existing.getId(), user1);
+
+        assertThat(exerciseRepository.existsById(existing.getId())).isEqualTo(false);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).isNotNull();
+    }
+
+    @Test
     void testUpdateExerciseById_NoAccess() {
         Exercise existing = saveTestExercise();
 

@@ -63,4 +63,12 @@ public class ExerciseController {
                 .body(Map.of("success", "Exercise updated."));
     }
 
+    @DeleteMapping("{exerciseId}")
+    ResponseEntity<Map<String, String>> deleteExerciseById(@PathVariable("exerciseId") Long id,
+                                                           @AuthenticationPrincipal User user) {
+        exerciseService.deleteExerciseById(id, user.getId());
+
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(Map.of("success", "Exercise deleted."));
+    }
 }
