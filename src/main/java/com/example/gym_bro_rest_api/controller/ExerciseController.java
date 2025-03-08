@@ -4,7 +4,7 @@ import com.example.gym_bro_rest_api.entities.User;
 import com.example.gym_bro_rest_api.model.ExerciseDTO;
 import com.example.gym_bro_rest_api.services.ExerciseService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.crossstore.ChangeSetPersister;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -70,5 +70,13 @@ public class ExerciseController {
 
         return ResponseEntity.status(HttpStatus.OK)
                 .body(Map.of("success", "Exercise deleted."));
+    }
+
+    @GetMapping
+    Page<ExerciseDTO> listExercisesOfUser(@AuthenticationPrincipal User user,
+                                          @RequestParam(required = false) Integer pageNumber,
+                                          @RequestParam(required = false) Integer pageSize) {
+
+        return exerciseService.listExercisesOfUser(user.getId(), pageNumber, pageSize);
     }
 }

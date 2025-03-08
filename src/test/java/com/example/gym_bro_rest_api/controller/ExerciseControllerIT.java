@@ -10,6 +10,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
@@ -55,6 +56,50 @@ class ExerciseControllerIT {
                 .build();
 
         return exerciseRepository.save(testExercise);
+    }
+
+    @Test
+x    void testListExercisesOfUser_Limit() {
+        for (int i = 0; i < 1001; i++) {
+            saveTestExercise();
+        }
+
+        Page<ExerciseDTO> dtos = exerciseController.listExercisesOfUser(user1, 1, 1001);
+
+        assertThat(dtos.getContent().size()).isEqualTo(1000);
+    }
+
+    @Test
+    void testListExercisesOfUser_25Exercises2ndPage() {
+        exerciseRepository.deleteAll();
+
+        for (int i = 0; i < 25; i++) {
+            saveTestExercise();
+        }
+
+        Page<ExerciseDTO> dtos = exerciseController.listExercisesOfUser(user1, 2, 20);
+
+        assertThat(dtos.getContent().size()).isEqualTo(5);
+    }
+
+    @Test
+    void testListExercisesOfUser_20Exercises1Page() {
+        for (int i = 0; i < 20; i++) {
+            saveTestExercise();
+        }
+
+        Page<ExerciseDTO> dtos = exerciseController.listExercisesOfUser(user1, 1, 20);
+
+        assertThat(dtos.getContent().size()).isEqualTo(20);
+    }
+
+    @Test
+    void testListExercisesOfUser_EmptyList() {
+        exerciseRepository.deleteAll();
+
+        Page<ExerciseDTO> dtos = exerciseController.listExercisesOfUser(user1, 1, 10);
+
+        assertThat(dtos.getContent().size()).isEqualTo(0);
     }
 
     @Test
