@@ -4,19 +4,20 @@ import com.example.gym_bro_rest_api.entities.User;
 import com.example.gym_bro_rest_api.model.ExerciseDTO;
 import com.example.gym_bro_rest_api.services.ExerciseService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 import java.util.Objects;
 
-@Controller
+@RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/exercise")
+@Slf4j
 public class ExerciseController {
     private final ExerciseService exerciseService;
 
@@ -24,8 +25,7 @@ public class ExerciseController {
     ResponseEntity<Map<String, String>> createNewExercise(@RequestBody ExerciseDTO exerciseDTO,
                                                           @AuthenticationPrincipal User user) {
         if (exerciseDTO.getName().isBlank() || exerciseDTO.getName().isEmpty()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(Map.of("error", "Exercise name can't be blank or empty."));
+           throw new BadNameException();
         }
 
         Long exerciseId = exerciseService.saveNewExercise(exerciseDTO, user).getId();
@@ -47,13 +47,12 @@ public class ExerciseController {
         return exerciseDTO;
     }
 
-    @PutMapping("{exerciseId}")
+    @PutMapping("/{exerciseId}")
     ResponseEntity<Map<String, String>> updateExerciseById(@PathVariable("exerciseId") Long id,
                                                            @RequestBody ExerciseDTO exerciseDTO,
                                                            @AuthenticationPrincipal User user) {
         if (exerciseDTO.getName().isBlank() || exerciseDTO.getName().isEmpty()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(Map.of("error", "Exercise name can't be blank or empty."));
+            throw new BadNameException();
         }
 
         ExerciseDTO updatedDTO = exerciseService.updateExerciseById(id, exerciseDTO, user)
@@ -63,7 +62,7 @@ public class ExerciseController {
                 .body(Map.of("success", "Exercise updated."));
     }
 
-    @DeleteMapping("{exerciseId}")
+    @DeleteMapping("/{exerciseId}")
     ResponseEntity<Map<String, String>> deleteExerciseById(@PathVariable("exerciseId") Long id,
                                                            @AuthenticationPrincipal User user) {
         exerciseService.deleteExerciseById(id, user.getId());
@@ -72,7 +71,7 @@ public class ExerciseController {
                 .body(Map.of("success", "Exercise deleted."));
     }
 
-    @GetMapping
+    @GetMapping()
     Page<ExerciseDTO> listExercisesOfUser(@AuthenticationPrincipal User user,
                                           @RequestParam(required = false) Integer pageNumber,
                                           @RequestParam(required = false) Integer pageSize) {

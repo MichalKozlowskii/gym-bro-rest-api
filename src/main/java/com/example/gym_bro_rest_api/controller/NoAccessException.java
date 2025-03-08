@@ -1,9 +1,5 @@
 package com.example.gym_bro_rest_api.controller;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.ResponseStatus;
-
-@ResponseStatus(value = HttpStatus.FORBIDDEN, reason = "No access.")
 public class NoAccessException extends RuntimeException {
     public NoAccessException() {
     }

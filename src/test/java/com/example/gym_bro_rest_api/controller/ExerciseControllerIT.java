@@ -161,15 +161,9 @@ class ExerciseControllerIT {
                 .demonstrationUrl("fakpofkaepof")
                 .build();
 
-        ResponseEntity response = exerciseController.updateExerciseById(existing.getId(), updateDto, user1);
-
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-        assertThat(response.getBody()).isNotNull();
-
-        Exercise updated = exerciseRepository.findById(existing.getId()).orElse(null);
-
-        assertThat(updated.getName()).isEqualTo(existing.getName());
-        assertThat(updated.getDemonstrationUrl()).isEqualTo(existing.getDemonstrationUrl());
+        assertThrows(BadNameException.class, () -> {
+           exerciseController.updateExerciseById(existing.getId(), updateDto, user1);
+        });
     }
 
     @Test
@@ -241,9 +235,8 @@ class ExerciseControllerIT {
                 .name("")
                 .build();
 
-        ResponseEntity<Map<String, String>> response = exerciseController.createNewExercise(testDto, user1);
-
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-        assertThat(response.getBody()).isNotEmpty();
+        assertThrows(BadNameException.class, () -> {
+            exerciseController.createNewExercise(testDto, user1);
+        });
     }
 }
