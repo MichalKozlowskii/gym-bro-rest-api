@@ -29,12 +29,10 @@ public class WorkoutPlan {
     @ManyToMany
     private List<Exercise> exercises;
 
+    @ElementCollection
+    private List<SetsReps> setsReps;
+
     @ManyToOne
     @NotNull
     private User user;
-
-    @ElementCollection
-    @MapKeyJoinColumn(name = "exercise_id")
-    @Column(name = "sets_reps")
-    private Map<Exercise, SetsReps> exerciseDetails = new HashMap<>();
 }
