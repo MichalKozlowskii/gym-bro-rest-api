@@ -4,7 +4,6 @@ import lombok.Builder;
 import lombok.Data;
 
 import java.util.List;
-import java.util.Map;
 
 @Builder
 @Data
@@ -13,5 +12,5 @@ public class WorkoutPlanDTO {
     private String name;
     private Long userId;
     private List<ExerciseDTO> exercises;
-    private List<SetsReps> exerciseDetails;
+    private List<SetsReps> setsReps;
 }
