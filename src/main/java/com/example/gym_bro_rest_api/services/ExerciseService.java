@@ -8,7 +8,7 @@ import java.util.Optional;
 
 public interface ExerciseService {
     ExerciseDTO saveNewExercise(ExerciseDTO exerciseDTO, User user);
-    Optional<ExerciseDTO> getExerciseById(Long id);
+    ExerciseDTO getExerciseById(Long id, Long userId);
     Optional<ExerciseDTO> updateExerciseById(Long id, ExerciseDTO exerciseDTO, User user);
     void deleteExerciseById(Long id, Long UserId);
     Page<ExerciseDTO> listExercisesOfUser(Long userId, Integer pageNumber, Integer pageSize);
