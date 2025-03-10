@@ -79,4 +79,17 @@ public class WorkoutPlanServiceImpl implements WorkoutPlanService {
             return workoutPlanMapper.workoutPlanToWorkoutPlanDto(updated);
         });
     }
+
+    @Override
+    public void deleteWorkoutPlanById(Long id, User user) {
+        if (!workoutPlanrepository.existsById(id)) {
+            throw new NotFoundException();
+        }
+
+        if (!workoutPlanrepository.existsByIdAndUserId(id, user.getId())) {
+            throw new NoAccessException();
+        }
+
+        workoutPlanrepository.deleteById(id);
+    }
 }

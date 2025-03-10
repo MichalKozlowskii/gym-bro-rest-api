@@ -10,4 +10,6 @@ public interface WorkoutPlanService {
     Optional<WorkoutPlanDTO> getWorkoutPlanById(Long id);
 
     Optional<Object> updateWorkoutPlanById(Long id, WorkoutPlanDTO workoutPlanDTO, User user);
+
+    void deleteWorkoutPlanById(Long id, User user);
 }

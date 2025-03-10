@@ -56,4 +56,13 @@ public class WorkoutPlanController {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(Map.of("success", "Workout plan updated."));
     }
+
+    @DeleteMapping("/{workoutPlanId}")
+    ResponseEntity<Map<String, String>> deleteWorkoutPlanById(@PathVariable("workoutPlanId") Long id,
+                                                              @AuthenticationPrincipal User user) {
+        workoutPlanService.deleteWorkoutPlanById(id, user);
+
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(Map.of("success", "Workout plan deleted."));
+    }
 }
