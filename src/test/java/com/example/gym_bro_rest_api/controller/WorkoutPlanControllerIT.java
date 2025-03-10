@@ -2,6 +2,7 @@ package com.example.gym_bro_rest_api.controller;
 
 import com.example.gym_bro_rest_api.entities.Exercise;
 import com.example.gym_bro_rest_api.entities.User;
+import com.example.gym_bro_rest_api.entities.WorkoutPlan;
 import com.example.gym_bro_rest_api.model.ExerciseDTO;
 import com.example.gym_bro_rest_api.model.SetsReps;
 import com.example.gym_bro_rest_api.model.WorkoutPlanDTO;
@@ -57,6 +58,28 @@ class WorkoutPlanControllerIT {
                 .user(user1)
                 .name("1")
                 .build());
+    }
+
+    @Test
+    void testGetWorkoutPlanById_NoAccess() {
+        WorkoutPlan saved = workoutPlanrepository.save(WorkoutPlan.builder().name("1").user(user1).build());
+
+        assertThrows(NoAccessException.class, () -> workoutPlanController.getWorkoutPlanById(saved.getId(), user2));
+    }
+
+    @Test
+    void testGetWorkoutPlanById_NotFound() {
+        assertThrows(NotFoundException.class, () -> workoutPlanController.getWorkoutPlanById(13241L, user1));
+    }
+
+    @Test
+    void testGetWorkoutPlanById_Success() {
+        WorkoutPlan saved = workoutPlanrepository.save(WorkoutPlan.builder().name("1").user(user1).build());
+
+        WorkoutPlanDTO workoutPlanDTO = workoutPlanController.getWorkoutPlanById(saved.getId(), user1);
+
+        assertThat(workoutPlanDTO).isNotNull();
+        assertThat(workoutPlanDTO.getUserId()).isEqualTo(user1.getId());
     }
 
     @Test
