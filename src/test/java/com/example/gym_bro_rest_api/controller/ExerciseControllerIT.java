@@ -56,6 +56,7 @@ class ExerciseControllerIT {
 
     @Test
     void testListExercisesOfUser_Limit() {
+        exerciseRepository.deleteAll();
         for (int i = 0; i < 1001; i++) {
             saveTestExercise();
         }
@@ -67,6 +68,7 @@ class ExerciseControllerIT {
 
     @Test
     void testListExercisesOfUser_25Exercises2ndPage() {
+        exerciseRepository.deleteAll();
         for (int i = 0; i < 25; i++) {
             saveTestExercise();
         }
@@ -78,6 +80,7 @@ class ExerciseControllerIT {
 
     @Test
     void testListExercisesOfUser_20Exercises1Page() {
+        exerciseRepository.deleteAll();
         for (int i = 0; i < 20; i++) {
             saveTestExercise();
         }
@@ -89,6 +92,7 @@ class ExerciseControllerIT {
 
     @Test
     void testListExercisesOfUser_EmptyList() {
+        exerciseRepository.deleteAll();
         Page<ExerciseDTO> dtos = exerciseController.listExercisesOfUser(user1, 1, 10);
 
         assertThat(dtos.getContent().size()).isEqualTo(0);
