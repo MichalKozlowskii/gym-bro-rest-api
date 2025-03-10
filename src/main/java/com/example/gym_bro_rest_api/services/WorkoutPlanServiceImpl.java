@@ -15,6 +15,7 @@ import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -46,5 +47,11 @@ public class WorkoutPlanServiceImpl implements WorkoutPlanService {
                 .build();
 
         return workoutPlanMapper.workoutPlanToWorkoutPlanDto(workoutPlanrepository.save(workoutPlan));
+    }
+
+    @Override
+    public Optional<WorkoutPlanDTO> getWorkoutPlanById(Long id) {
+        return workoutPlanrepository.findById(id)
+                .map(workoutPlanMapper::workoutPlanToWorkoutPlanDto);
     }
 }

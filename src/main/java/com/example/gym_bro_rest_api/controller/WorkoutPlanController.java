@@ -7,12 +7,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
+import java.util.Objects;
 
 @RestController
 @RequiredArgsConstructor
@@ -32,5 +30,16 @@ public class WorkoutPlanController {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .header("Location", "/api/workout-plan/" + workoutPlanId)
                 .body(Map.of("success", "Workout plan created."));
+    }
+
+    @GetMapping("/{workoutPlanId}")
+    WorkoutPlanDTO getWorkoutPlanById(@PathVariable("workoutPlanId") Long id, @AuthenticationPrincipal User user) {
+        WorkoutPlanDTO workoutPlanDTO = workoutPlanService.getWorkoutPlanById(id).orElseThrow(NotFoundException::new);
+
+        if (!Objects.equals(user.getId(), workoutPlanDTO.getUserId())) {
+            throw new NoAccessException();
+        }
+
+        return workoutPlanDTO ;
     }
 }
