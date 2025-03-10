@@ -51,9 +51,9 @@ public class ExerciseServiceImpl implements ExerciseService {
 
             exercise.setName(exerciseDTO.getName());
             exercise.setDemonstrationUrl(exerciseDTO.getDemonstrationUrl());
-            exerciseRepository.save(exercise);
+            Exercise updated = exerciseRepository.save(exercise);
 
-            return exerciseMapper.exerciseToExerciseDto(exercise);
+            return exerciseMapper.exerciseToExerciseDto(updated);
         });
     }
 
