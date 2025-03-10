@@ -71,6 +71,30 @@ class WorkoutPlanControllerIT {
     }
 
     @Test
+    void testDeleteWorkoutPlanById_NoAccess() {
+        WorkoutPlan workoutPlan = saveTestWorkoutPlan();
+
+        assertThrows(NoAccessException.class, () ->
+                workoutPlanController.deleteWorkoutPlanById(workoutPlan.getId(), user2));
+    }
+
+    @Test
+    void testDeleteWorkoutPlanById_NotFound() {
+        assertThrows(NotFoundException.class, () ->
+                workoutPlanController.deleteWorkoutPlanById(41242141L, user1));
+    }
+
+    @Test
+    void testDeleteWorkoutPlanById_Success() {
+        WorkoutPlan workoutPlan = saveTestWorkoutPlan();
+
+        ResponseEntity response = workoutPlanController.deleteWorkoutPlanById(workoutPlan.getId(), user1);
+
+        assertThat(workoutPlanrepository.findById(workoutPlan.getId())).isEmpty();
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+    }
+
+    @Test
     void testUpdateWorkoutPlanById_NoAccess() {
         WorkoutPlan workoutPlan = saveTestWorkoutPlan();
 
