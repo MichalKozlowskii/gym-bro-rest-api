@@ -71,9 +71,9 @@ public class ExerciseServiceImpl implements ExerciseService {
     }
 
     @Override
-    public Page<ExerciseDTO> listExercisesOfUser(Long userId, Integer pageNumber, Integer pageSize) {
+    public Page<ExerciseDTO> listExercisesOfUser(User user, Integer pageNumber, Integer pageSize) {
         PageRequest pageRequest = buildPageRequest(pageNumber, pageSize);
-        Page<Exercise> exercisePage = exerciseRepository.findExercisesByUserId(userId, pageRequest);
+        Page<Exercise> exercisePage = exerciseRepository.findExercisesByUserId(user.getId(), pageRequest);
 
         return exercisePage.map(exerciseMapper::exerciseToExerciseDto);
     }

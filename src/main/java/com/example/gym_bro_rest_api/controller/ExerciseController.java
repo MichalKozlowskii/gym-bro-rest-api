@@ -75,6 +75,6 @@ public class ExerciseController {
                                           @RequestParam(required = false) Integer pageNumber,
                                           @RequestParam(required = false) Integer pageSize) {
 
-        return exerciseService.listExercisesOfUser(user.getId(), pageNumber, pageSize);
+        return exerciseService.listExercisesOfUser(user, pageNumber, pageSize);
     }
 }

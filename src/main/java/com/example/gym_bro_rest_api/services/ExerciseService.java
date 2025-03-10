@@ -11,5 +11,5 @@ public interface ExerciseService {
     Optional<ExerciseDTO> getExerciseById(Long id);
     Optional<ExerciseDTO> updateExerciseById(Long id, ExerciseDTO exerciseDTO, User user);
     void deleteExerciseById(Long id, User user);
-    Page<ExerciseDTO> listExercisesOfUser(Long userId, Integer pageNumber, Integer pageSize);
+    Page<ExerciseDTO> listExercisesOfUser(User user, Integer pageNumber, Integer pageSize);
 }
