@@ -5,7 +5,9 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Entity
@@ -33,4 +35,8 @@ public class WorkoutPlan {
     @ManyToOne
     @NotNull
     private User user;
+
+    @CreationTimestamp
+    @Column(updatable = false)
+    private LocalDate creationDate;
 }
