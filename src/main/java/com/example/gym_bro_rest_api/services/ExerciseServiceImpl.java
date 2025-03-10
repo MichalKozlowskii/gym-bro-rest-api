@@ -78,7 +78,7 @@ public class ExerciseServiceImpl implements ExerciseService {
         return exercisePage.map(exerciseMapper::exerciseToExerciseDto);
     }
 
-    private PageRequest buildPageRequest(Integer pageNumber, Integer pageSize) {
+    public static PageRequest buildPageRequest(Integer pageNumber, Integer pageSize) {
         int queryPageNumber;
         int queryPageSize;
 

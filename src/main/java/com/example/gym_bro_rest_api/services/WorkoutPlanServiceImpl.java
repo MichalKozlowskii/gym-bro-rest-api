@@ -5,21 +5,20 @@ import com.example.gym_bro_rest_api.controller.NotFoundException;
 import com.example.gym_bro_rest_api.entities.Exercise;
 import com.example.gym_bro_rest_api.entities.User;
 import com.example.gym_bro_rest_api.entities.WorkoutPlan;
-import com.example.gym_bro_rest_api.mappers.ExerciseMapper;
 import com.example.gym_bro_rest_api.mappers.WorkoutPlanMapper;
 import com.example.gym_bro_rest_api.model.ExerciseDTO;
 import com.example.gym_bro_rest_api.model.WorkoutPlanDTO;
 import com.example.gym_bro_rest_api.repositories.ExerciseRepository;
 import com.example.gym_bro_rest_api.repositories.WorkoutPlanrepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.parameters.P;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -91,5 +90,13 @@ public class WorkoutPlanServiceImpl implements WorkoutPlanService {
         }
 
         workoutPlanrepository.deleteById(id);
+    }
+
+    @Override
+    public Page<WorkoutPlanDTO> listExercisesOfUser(User user, Integer pageNumber, Integer pageSize) {
+        PageRequest pageRequest = ExerciseServiceImpl.buildPageRequest(pageNumber, pageSize);
+        Page<WorkoutPlan> workoutPlansPage = workoutPlanrepository.findWorkoutPlansByUserId(user.getId(), pageRequest);
+
+        return workoutPlansPage.map(workoutPlanMapper::workoutPlanToWorkoutPlanDto);
     }
 }

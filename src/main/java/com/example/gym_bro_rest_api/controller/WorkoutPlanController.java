@@ -4,6 +4,7 @@ import com.example.gym_bro_rest_api.entities.User;
 import com.example.gym_bro_rest_api.model.WorkoutPlanDTO;
 import com.example.gym_bro_rest_api.services.WorkoutPlanService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -64,5 +65,13 @@ public class WorkoutPlanController {
 
         return ResponseEntity.status(HttpStatus.OK)
                 .body(Map.of("success", "Workout plan deleted."));
+    }
+
+    @GetMapping()
+    Page<WorkoutPlanDTO> listWorkoutPlansOfUser(@AuthenticationPrincipal User user,
+                                                @RequestParam(required = false) Integer pageNumber,
+                                                @RequestParam(required = false) Integer pageSize) {
+
+        return workoutPlanService.listExercisesOfUser(user, pageNumber, pageSize);
     }
 }
