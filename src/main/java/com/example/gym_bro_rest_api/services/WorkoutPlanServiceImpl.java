@@ -15,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -68,11 +69,11 @@ public class WorkoutPlanServiceImpl implements WorkoutPlanService {
                 throw new NoAccessException();
             }
 
-            List<Exercise> exercises = convertExerciseDtoList(workoutPlanDTO.getExercises(), user);
+            List<Exercise> exercises = new ArrayList<>(convertExerciseDtoList(workoutPlanDTO.getExercises(), user));
 
-            workoutPlan.setName(workoutPlan.getName());
+            workoutPlan.setName(workoutPlanDTO.getName());
             workoutPlan.setExercises(exercises);
-            workoutPlan.setSetsReps(workoutPlanDTO.getSetsReps());
+            workoutPlan.setSetsReps(new ArrayList<>(workoutPlanDTO.getSetsReps()));
             WorkoutPlan updated = workoutPlanrepository.save(workoutPlan);
 
             return workoutPlanMapper.workoutPlanToWorkoutPlanDto(updated);
