@@ -23,22 +23,25 @@ public class BootstrapData implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
+        User user;
+
         if (userRepository.count() < 1) {
-            User user = User.builder()
+            User user1 = User.builder()
                     .username("user1")
                     .password(passwordEncoder.encode("password"))
                     .enabled(true)
                     .build();
-            User user1 = userRepository.save(user);
-        }
+            user = userRepository.save(user1);
 
-        if (exerciseRepository.count() < 10) {
-            for (int i = 0; i < 10; i++) {
-                Exercise exercise = Exercise.builder()
-                        .name(String.valueOf(i))
-                        .build();
+            if (exerciseRepository.count() < 10) {
+                for (int i = 0; i < 10; i++) {
+                    Exercise exercise = Exercise.builder()
+                            .name("exercise" + i)
+                            .user(user)
+                            .build();
 
-                exerciseRepository.save(exercise);
+                    exerciseRepository.save(exercise);
+                }
             }
         }
     }
