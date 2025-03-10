@@ -37,7 +37,14 @@ public class ExerciseController {
 
     @GetMapping("/{exerciseId}")
     ExerciseDTO getExerciseById(@PathVariable("exerciseId") Long id, @AuthenticationPrincipal User user) {
-        return exerciseService.getExerciseById(id, user.getId());
+
+        ExerciseDTO exerciseDTO = exerciseService.getExerciseById(id).orElseThrow(NotFoundException::new);
+
+        if (!Objects.equals(user.getId(), exerciseDTO.getUserId())) {
+            throw new NoAccessException();
+        }
+
+        return exerciseDTO;
     }
 
     @PutMapping("/{exerciseId}")

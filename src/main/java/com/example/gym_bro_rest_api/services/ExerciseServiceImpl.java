@@ -37,16 +37,9 @@ public class ExerciseServiceImpl implements ExerciseService {
     }
 
     @Override
-    public ExerciseDTO getExerciseById(Long id, Long userId) {
-        if (!exerciseRepository.existsById(id)) {
-            throw new NotFoundException();
-        }
-
-        if (!exerciseRepository.existsByIdAndUserId(id, userId)) {
-            throw new NoAccessException();
-        }
-
-        return exerciseMapper.exerciseToExerciseDto(exerciseRepository.findById(id).get());
+    public Optional<ExerciseDTO> getExerciseById(Long id) {
+        return exerciseRepository.findById(id)
+                .map(exerciseMapper::exerciseToExerciseDto);
     }
 
     @Override
