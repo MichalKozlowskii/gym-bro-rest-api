@@ -17,6 +17,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -58,6 +59,78 @@ class WorkoutPlanControllerIT {
                 .user(user1)
                 .name("1")
                 .build());
+    }
+
+    WorkoutPlan saveTestWorkoutPlan() {
+        return workoutPlanrepository.save(WorkoutPlan.builder()
+                .name("test")
+                .exercises(new ArrayList<>(List.of(testExercise)))
+                .user(user1)
+                .setsReps(new ArrayList<>(List.of(new SetsReps(3, 8))))
+                .build());
+    }
+
+    @Test
+    void testUpdateWorkoutPlanById_NoAccess() {
+        WorkoutPlan workoutPlan = saveTestWorkoutPlan();
+
+        WorkoutPlanDTO workoutPlanDTO = WorkoutPlanDTO.builder()
+                .name("dwdawda")
+                .setsReps(List.of(new SetsReps(3, 8)))
+                .build();
+
+        assertThrows(NoAccessException.class, () ->
+                workoutPlanController.updateWorkoutPlanById(workoutPlan.getId(), workoutPlanDTO, user2));
+    }
+
+    @Test
+    void testUpdateWorkoutPlanById_NotFound() {
+        WorkoutPlanDTO workoutPlanDTO = WorkoutPlanDTO.builder()
+                .name("workoutplan")
+                .setsReps(List.of(new SetsReps(3, 8)))
+                .build();
+
+        System.out.println(workoutPlanDTO.getName());
+
+        assertThrows(NotFoundException.class, () ->
+                workoutPlanController.updateWorkoutPlanById(3421421L, workoutPlanDTO, user1));
+    }
+
+    @Test
+    void testUpdateWorkoutPlanById_BadName() {
+        WorkoutPlan workoutPlan = saveTestWorkoutPlan();
+
+        WorkoutPlanDTO workoutPlanDTO = WorkoutPlanDTO.builder()
+                .name("")
+                .setsReps(List.of(new SetsReps(3, 8)))
+                .build();
+
+        assertThrows(BadNameException.class, () ->
+                workoutPlanController.updateWorkoutPlanById(workoutPlan.getId(), workoutPlanDTO, user1));
+    }
+
+    @Test
+    void testUpdateWorkoutPlanById_Success() {
+        WorkoutPlan workoutPlan = saveTestWorkoutPlan();
+
+        ExerciseDTO testExerciseDto = ExerciseDTO.builder()
+                .id(testExercise.getId())
+                .build();
+
+        WorkoutPlanDTO workoutPlanDTO = WorkoutPlanDTO.builder()
+                .name("test_updated")
+                .exercises(List.of(testExerciseDto))
+                .setsReps(List.of(new SetsReps(3, 8)))
+                .build();
+
+        ResponseEntity<Map<String, String>> response = workoutPlanController.updateWorkoutPlanById(
+                workoutPlan.getId(), workoutPlanDTO, user1);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+        WorkoutPlan updated = workoutPlanrepository.findById(workoutPlan.getId()).get();
+
+        assertThat(updated.getName()).isEqualTo(workoutPlanDTO.getName());
     }
 
     @Test
