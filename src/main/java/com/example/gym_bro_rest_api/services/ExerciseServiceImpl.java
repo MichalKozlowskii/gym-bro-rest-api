@@ -99,7 +99,7 @@ public class ExerciseServiceImpl implements ExerciseService {
             }
         }
 
-        Sort sort = Sort.by(Sort.Order.asc("name"));
+        Sort sort = Sort.by(Sort.Order.desc("creationDate"));
 
         return PageRequest.of(queryPageNumber, queryPageSize, sort);
     }
