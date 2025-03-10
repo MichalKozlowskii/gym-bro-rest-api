@@ -42,4 +42,18 @@ public class WorkoutPlanController {
 
         return workoutPlanDTO ;
     }
+
+    @PutMapping("/{workoutPlanId}")
+    ResponseEntity<Map<String, String>> updateWorkoutPlanById(@PathVariable("workoutPlanId") Long id,
+                                                              @RequestBody WorkoutPlanDTO workoutPlanDTO,
+                                                              @AuthenticationPrincipal User user) {
+        if (workoutPlanDTO.getName().isEmpty() || workoutPlanDTO.getName().isBlank()) {
+            throw new BadNameException();
+        }
+
+        workoutPlanService.updateWorkoutPlanById(id, workoutPlanDTO, user).orElseThrow(NotFoundException::new);
+
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(Map.of("success", "Workout plan updated."));
+    }
 }

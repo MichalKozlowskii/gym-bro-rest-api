@@ -7,6 +7,7 @@ import com.example.gym_bro_rest_api.entities.User;
 import com.example.gym_bro_rest_api.entities.WorkoutPlan;
 import com.example.gym_bro_rest_api.mappers.ExerciseMapper;
 import com.example.gym_bro_rest_api.mappers.WorkoutPlanMapper;
+import com.example.gym_bro_rest_api.model.ExerciseDTO;
 import com.example.gym_bro_rest_api.model.WorkoutPlanDTO;
 import com.example.gym_bro_rest_api.repositories.ExerciseRepository;
 import com.example.gym_bro_rest_api.repositories.WorkoutPlanrepository;
@@ -15,6 +16,7 @@ import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -24,9 +26,9 @@ public class WorkoutPlanServiceImpl implements WorkoutPlanService {
     private final WorkoutPlanMapper workoutPlanMapper;
     private final WorkoutPlanrepository workoutPlanrepository;
     private final ExerciseRepository exerciseRepository;
-    @Override
-    public WorkoutPlanDTO saveNewWorkoutPlan(WorkoutPlanDTO workoutPlanDTO, User user) {
-        List<Exercise> exercises = workoutPlanDTO.getExercises().stream()
+
+    private List<Exercise> convertExerciseDtoList(List<ExerciseDTO> list, User user) {
+        return list.stream()
                 .map(exerciseDTO -> {
                     Exercise exercise = exerciseRepository.findById(exerciseDTO.getId())
                             .orElseThrow(NotFoundException::new);
@@ -38,6 +40,10 @@ public class WorkoutPlanServiceImpl implements WorkoutPlanService {
                     return exercise;
                 })
                 .toList();
+    }
+    @Override
+    public WorkoutPlanDTO saveNewWorkoutPlan(WorkoutPlanDTO workoutPlanDTO, User user) {
+        List<Exercise> exercises = convertExerciseDtoList(workoutPlanDTO.getExercises(), user);
 
         WorkoutPlan workoutPlan = WorkoutPlan.builder()
                 .name(workoutPlanDTO.getName())
@@ -53,5 +59,23 @@ public class WorkoutPlanServiceImpl implements WorkoutPlanService {
     public Optional<WorkoutPlanDTO> getWorkoutPlanById(Long id) {
         return workoutPlanrepository.findById(id)
                 .map(workoutPlanMapper::workoutPlanToWorkoutPlanDto);
+    }
+
+    @Override
+    public Optional<Object> updateWorkoutPlanById(Long id, WorkoutPlanDTO workoutPlanDTO, User user) {
+        return workoutPlanrepository.findById(id).map(workoutPlan -> {
+            if (!Objects.equals(workoutPlan.getUser().getId(), user.getId())) {
+                throw new NoAccessException();
+            }
+
+            List<Exercise> exercises = convertExerciseDtoList(workoutPlanDTO.getExercises(), user);
+
+            workoutPlan.setName(workoutPlan.getName());
+            workoutPlan.setExercises(exercises);
+            workoutPlan.setSetsReps(workoutPlanDTO.getSetsReps());
+            WorkoutPlan updated = workoutPlanrepository.save(workoutPlan);
+
+            return workoutPlanMapper.workoutPlanToWorkoutPlanDto(updated);
+        });
     }
 }
