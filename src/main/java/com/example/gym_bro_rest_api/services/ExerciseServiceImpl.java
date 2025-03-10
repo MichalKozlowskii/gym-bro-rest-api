@@ -58,12 +58,12 @@ public class ExerciseServiceImpl implements ExerciseService {
     }
 
     @Override
-    public void deleteExerciseById(Long id, Long userId) {
+    public void deleteExerciseById(Long id, User user) {
         if (!exerciseRepository.existsById(id)) {
             throw new NotFoundException();
         }
 
-        if (!exerciseRepository.existsByIdAndUserId(id, userId)) {
+        if (!exerciseRepository.existsByIdAndUserId(id, user.getId())) {
             throw new NoAccessException();
         }
 
