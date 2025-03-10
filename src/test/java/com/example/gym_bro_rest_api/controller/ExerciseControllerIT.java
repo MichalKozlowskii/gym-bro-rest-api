@@ -4,7 +4,6 @@ import com.example.gym_bro_rest_api.entities.Exercise;
 import com.example.gym_bro_rest_api.entities.User;
 import com.example.gym_bro_rest_api.model.ExerciseDTO;
 import com.example.gym_bro_rest_api.repositories.ExerciseRepository;
-import com.example.gym_bro_rest_api.services.UserService;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -24,9 +23,6 @@ import static org.junit.jupiter.api.Assertions.*;
 class ExerciseControllerIT {
     @Autowired
     ExerciseController exerciseController;
-
-    @Autowired
-    UserService userService;
 
     @Autowired
     ExerciseRepository exerciseRepository;
