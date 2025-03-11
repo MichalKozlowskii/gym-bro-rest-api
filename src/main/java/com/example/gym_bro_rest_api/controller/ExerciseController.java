@@ -55,8 +55,7 @@ public class ExerciseController {
             throw new BadNameException();
         }
 
-        ExerciseDTO updatedDTO = exerciseService.updateExerciseById(id, exerciseDTO, user)
-                .orElseThrow(NotFoundException::new);
+        exerciseService.updateExerciseById(id, exerciseDTO, user).orElseThrow(NotFoundException::new);
         
         return ResponseEntity.status(HttpStatus.OK)
                 .body(Map.of("success", "Exercise updated."));
@@ -65,7 +64,7 @@ public class ExerciseController {
     @DeleteMapping("/{exerciseId}")
     ResponseEntity<Map<String, String>> deleteExerciseById(@PathVariable("exerciseId") Long id,
                                                            @AuthenticationPrincipal User user) {
-        exerciseService.deleteExerciseById(id, user.getId());
+        exerciseService.deleteExerciseById(id, user);
 
         return ResponseEntity.status(HttpStatus.OK)
                 .body(Map.of("success", "Exercise deleted."));
@@ -76,6 +75,6 @@ public class ExerciseController {
                                           @RequestParam(required = false) Integer pageNumber,
                                           @RequestParam(required = false) Integer pageSize) {
 
-        return exerciseService.listExercisesOfUser(user.getId(), pageNumber, pageSize);
+        return exerciseService.listExercisesOfUser(user, pageNumber, pageSize);
     }
 }

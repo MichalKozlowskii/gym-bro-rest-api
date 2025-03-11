@@ -24,6 +24,7 @@ class ExerciseRepositoryIT {
     UserRepository userRepository;
 
     User user;
+    Exercise testExercise;
 
     @BeforeEach
     void setUp() {
@@ -33,7 +34,7 @@ class ExerciseRepositoryIT {
                 .enabled(true)
                 .build());
 
-        exerciseRepository.save(Exercise.builder()
+       testExercise = exerciseRepository.save(Exercise.builder()
                         .name("exc1")
                         .demonstrationUrl("adsad")
                         .user(user)
@@ -60,5 +61,17 @@ class ExerciseRepositoryIT {
         List<Exercise> exerciseList = exercisePage.getContent();
 
         assertThat(exerciseList.size()).isEqualTo(3);
+    }
+
+    @Test
+    void testExistsByIdAndUserId_GoodUserId() {
+        Boolean exists = exerciseRepository.existsByIdAndUserId(testExercise.getId(), user.getId());
+        assertThat(exists).isTrue();
+    }
+
+    @Test
+    void testExistsByIdAndUserId_BadUserId() {
+        Boolean exists = exerciseRepository.existsByIdAndUserId(testExercise.getId(), 123213L);
+        assertThat(exists).isFalse();
     }
 }

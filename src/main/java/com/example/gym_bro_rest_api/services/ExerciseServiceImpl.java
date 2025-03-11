@@ -51,19 +51,19 @@ public class ExerciseServiceImpl implements ExerciseService {
 
             exercise.setName(exerciseDTO.getName());
             exercise.setDemonstrationUrl(exerciseDTO.getDemonstrationUrl());
-            exerciseRepository.save(exercise);
+            Exercise updated = exerciseRepository.save(exercise);
 
-            return exerciseMapper.exerciseToExerciseDto(exercise);
+            return exerciseMapper.exerciseToExerciseDto(updated);
         });
     }
 
     @Override
-    public void deleteExerciseById(Long id, Long userId) {
+    public void deleteExerciseById(Long id, User user) {
         if (!exerciseRepository.existsById(id)) {
             throw new NotFoundException();
         }
 
-        if (!exerciseRepository.existsByIdAndUserId(id, userId)) {
+        if (!exerciseRepository.existsByIdAndUserId(id, user.getId())) {
             throw new NoAccessException();
         }
 
@@ -71,14 +71,14 @@ public class ExerciseServiceImpl implements ExerciseService {
     }
 
     @Override
-    public Page<ExerciseDTO> listExercisesOfUser(Long userId, Integer pageNumber, Integer pageSize) {
+    public Page<ExerciseDTO> listExercisesOfUser(User user, Integer pageNumber, Integer pageSize) {
         PageRequest pageRequest = buildPageRequest(pageNumber, pageSize);
-        Page<Exercise> exercisePage = exerciseRepository.findExercisesByUserId(userId, pageRequest);
+        Page<Exercise> exercisePage = exerciseRepository.findExercisesByUserId(user.getId(), pageRequest);
 
         return exercisePage.map(exerciseMapper::exerciseToExerciseDto);
     }
 
-    private PageRequest buildPageRequest(Integer pageNumber, Integer pageSize) {
+    public static PageRequest buildPageRequest(Integer pageNumber, Integer pageSize) {
         int queryPageNumber;
         int queryPageSize;
 
@@ -99,7 +99,7 @@ public class ExerciseServiceImpl implements ExerciseService {
             }
         }
 
-        Sort sort = Sort.by(Sort.Order.asc("name"));
+        Sort sort = Sort.by(Sort.Order.desc("creationDate"));
 
         return PageRequest.of(queryPageNumber, queryPageSize, sort);
     }

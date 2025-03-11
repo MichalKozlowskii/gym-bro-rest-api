@@ -10,6 +10,6 @@ public interface ExerciseService {
     ExerciseDTO saveNewExercise(ExerciseDTO exerciseDTO, User user);
     Optional<ExerciseDTO> getExerciseById(Long id);
     Optional<ExerciseDTO> updateExerciseById(Long id, ExerciseDTO exerciseDTO, User user);
-    void deleteExerciseById(Long id, Long UserId);
-    Page<ExerciseDTO> listExercisesOfUser(Long userId, Integer pageNumber, Integer pageSize);
+    void deleteExerciseById(Long id, User user);
+    Page<ExerciseDTO> listExercisesOfUser(User user, Integer pageNumber, Integer pageSize);
 }

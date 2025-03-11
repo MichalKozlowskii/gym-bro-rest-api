@@ -1,12 +1,14 @@
 package com.example.gym_bro_rest_api.entities;
 
+import com.example.gym_bro_rest_api.model.SetsReps;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
+import java.util.List;
 
 @Entity
 @Getter
@@ -14,8 +16,8 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "exercises")
-public class Exercise {
+@Table(name = "workout_plans")
+public class WorkoutPlan {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -24,7 +26,11 @@ public class Exercise {
     @NotNull
     private String name;
 
-    private String demonstrationUrl;
+    @ManyToMany
+    private List<Exercise> exercises;
+
+    @ElementCollection
+    private List<SetsReps> setsReps;
 
     @ManyToOne
     @NotNull
@@ -32,5 +38,5 @@ public class Exercise {
 
     @CreationTimestamp
     @Column(updatable = false)
-    private LocalDateTime creationDate;
+    private LocalDate creationDate;
 }
