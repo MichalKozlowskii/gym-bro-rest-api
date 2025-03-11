@@ -5,7 +5,7 @@ import com.example.gym_bro_rest_api.model.WorkoutPlanDTO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-@Mapper
+@Mapper(uses = ExerciseMapper.class)
 public interface WorkoutPlanMapper {
     @Mapping(source = "user.id", target = "userId")
     WorkoutPlanDTO workoutPlanToWorkoutPlanDto(WorkoutPlan workoutPlan);
