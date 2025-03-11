@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
 
+import java.time.LocalDateTime;
+
 @Builder
 @Data
 public class ExerciseDTO {
@@ -20,5 +22,5 @@ public class ExerciseDTO {
     @NotNull
     private Long userId;
 
-    private CreationTimestamp creationDate;
+    private LocalDateTime creationDate;
 }
