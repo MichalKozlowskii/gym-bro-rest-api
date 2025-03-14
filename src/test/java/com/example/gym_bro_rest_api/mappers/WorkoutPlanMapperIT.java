@@ -7,6 +7,8 @@ import com.example.gym_bro_rest_api.model.SetsReps;
 import com.example.gym_bro_rest_api.model.WorkoutPlanDTO;
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,8 +16,10 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
+@SpringBootTest
 class WorkoutPlanMapperUnitTest {
-    private final WorkoutPlanMapper workoutPlanMapper = Mappers.getMapper(WorkoutPlanMapper.class);
+    @Autowired
+    private WorkoutPlanMapper workoutPlanMapper;
 
     @Test
     void testWorkoutPlanToWorkoutDto() {
