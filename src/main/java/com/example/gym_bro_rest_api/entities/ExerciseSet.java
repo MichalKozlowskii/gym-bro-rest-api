@@ -27,6 +27,10 @@ public class ExerciseSet {
     @ManyToOne
     private User user;
 
+    private Double weight;
+
+    private Integer reps;
+
     @CreationTimestamp
     @Column(updatable = false)
     private LocalDateTime creationDate;
