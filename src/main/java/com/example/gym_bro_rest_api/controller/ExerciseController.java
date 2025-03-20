@@ -2,7 +2,7 @@ package com.example.gym_bro_rest_api.controller;
 
 import com.example.gym_bro_rest_api.entities.User;
 import com.example.gym_bro_rest_api.model.ExerciseDTO;
-import com.example.gym_bro_rest_api.services.ExerciseService;
+import com.example.gym_bro_rest_api.services.exercise.ExerciseService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
