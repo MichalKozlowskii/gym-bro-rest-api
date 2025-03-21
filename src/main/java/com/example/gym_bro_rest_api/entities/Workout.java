@@ -5,6 +5,7 @@ import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -23,7 +24,7 @@ public class Workout {
     private WorkoutPlan workoutPlan;
 
     @OneToMany
-    private List<ExerciseSet> sets;
+    private List<ExerciseSet> sets = new ArrayList<>();
 
     @ManyToOne
     private User user;

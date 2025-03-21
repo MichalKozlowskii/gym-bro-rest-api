@@ -1,6 +1,7 @@
 package com.example.gym_bro_rest_api.entities;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
@@ -19,16 +20,21 @@ public class ExerciseSet {
     private Long id;
 
     @ManyToOne
+    @NotNull
     private Exercise exercise;
 
     @ManyToOne
+    @NotNull
     private Workout workout;
 
     @ManyToOne
+    @NotNull
     private User user;
 
+    @NotNull
     private Double weight;
 
+    @NotNull
     private Integer reps;
 
     @CreationTimestamp
