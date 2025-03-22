@@ -8,4 +8,5 @@ import com.example.gym_bro_rest_api.model.workout.WorkoutCreationDTO;
 public interface WorkoutService {
     Long saveNewWorkout(WorkoutCreationDTO workoutCreationDTO, User user);
     Workout addNewSet(Long workoutId, ExerciseSetDTO exerciseSetDTO, User user);
+    Boolean deleteSet(Long workoutId, Long setId, User user);
 }

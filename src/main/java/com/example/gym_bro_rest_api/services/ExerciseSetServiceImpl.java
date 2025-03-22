@@ -10,6 +10,8 @@ import com.example.gym_bro_rest_api.services.exercise.ExerciseQueryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 public class ExerciseSetServiceImpl implements ExerciseSetService {
@@ -24,5 +26,20 @@ public class ExerciseSetServiceImpl implements ExerciseSetService {
                         .weight(exerciseSetDTO.getWeight())
                         .reps(exerciseSetDTO.getReps())
                 .build());
+    }
+
+    @Override
+    public Optional<ExerciseSet> getExerciseSetById(Long id) {
+        return exerciseSetRepository.findById(id);
+    }
+
+    @Override
+    public Boolean deleteSetById(Long id) {
+        if (exerciseSetRepository.existsById(id)) {
+            exerciseSetRepository.deleteById(id);
+            return true;
+        } else {
+            return false;
+        }
     }
 }
