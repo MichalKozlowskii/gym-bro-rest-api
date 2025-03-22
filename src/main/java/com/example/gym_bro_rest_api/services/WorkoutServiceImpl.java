@@ -85,4 +85,21 @@ public class WorkoutServiceImpl implements WorkoutService {
 
         return exerciseSetService.deleteSetById(setId);
     }
+
+    @Override
+    public void deleteWorkoutById(Long workoutId, User user) {
+        Workout workout = workoutRepository.findById(workoutId).orElseThrow(NotFoundException::new);
+
+        if (!workout.getUser().equals(user)) {
+            throw new NoAccessException();
+        }
+
+        if (!workout.getSets().isEmpty()) {
+            workout.getSets().forEach(set -> {
+                exerciseSetService.deleteSetById(set.getId());
+            });
+        }
+
+        workoutRepository.delete(workout);
+    }
 }
