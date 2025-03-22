@@ -269,4 +269,73 @@ class WorkoutServiceImplUnitTest {
 
         assertThrows(NoAccessException.class, () -> workoutService.deleteSet(111L, 111L, user));
     }
+
+    @Test
+    void testDeleteWorkout_DeleteSets_Success() {
+        Workout savedWorkout = Workout.builder()
+                .id(1L)
+                .workoutPlan(workoutPlan)
+                .sets(new ArrayList<>())
+                .user(user)
+                .build();
+
+        ExerciseSet savedSet = ExerciseSet.builder()
+                .id(1L)
+                .weight(50.)
+                .reps(8)
+                .exercise(Exercise.builder().id(1L).name("bench press").build())
+                .workout(savedWorkout)
+                .user(user)
+                .build();
+
+        savedWorkout.getSets().add(savedSet);
+
+        given(workoutRepository.findById(any(Long.class))).willReturn(Optional.of(savedWorkout));
+        given(exerciseSetService.deleteSetById(any(Long.class))).willReturn(true);
+
+        workoutService.deleteWorkoutById(savedWorkout.getId(), user);
+
+        verify(exerciseSetService, times(1)).deleteSetById(savedSet.getId());
+        verify(workoutRepository, times(1)).delete(savedWorkout);
+    }
+
+    @Test
+    void testDeleteWorkout_NoSetsToDelete_Success() {
+        Workout savedWorkout = Workout.builder()
+                .id(1L)
+                .workoutPlan(workoutPlan)
+                .sets(new ArrayList<>())
+                .user(user)
+                .build();
+
+        given(workoutRepository.findById(any(Long.class))).willReturn(Optional.of(savedWorkout));
+        given(exerciseSetService.deleteSetById(any(Long.class))).willReturn(true);
+
+        workoutService.deleteWorkoutById(savedWorkout.getId(), user);
+
+        verify(exerciseSetService, never()).deleteSetById(any(Long.class));
+        verify(workoutRepository, times(1)).delete(savedWorkout);
+    }
+
+    @Test
+    void testDeleteWorkout_NotFound() {
+        given(workoutRepository.findById(any(Long.class))).willReturn(Optional.empty());
+
+        assertThrows(NotFoundException.class, () -> workoutService.deleteWorkoutById(12313L, user));
+    }
+
+    @Test
+    void testDeleteWorkout_NotAccess() {
+        Workout savedWorkout = Workout.builder()
+                .id(1L)
+                .workoutPlan(workoutPlan)
+                .sets(new ArrayList<>())
+                .user(user)
+                .build();
+
+        given(workoutRepository.findById(any(Long.class))).willReturn(Optional.of(savedWorkout));
+
+        assertThrows(NoAccessException.class, () ->
+                workoutService.deleteWorkoutById(savedWorkout.getId(), User.builder().build()));
+    }
 }
