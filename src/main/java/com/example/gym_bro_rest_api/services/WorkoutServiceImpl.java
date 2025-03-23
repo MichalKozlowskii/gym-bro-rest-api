@@ -7,11 +7,16 @@ import com.example.gym_bro_rest_api.entities.User;
 import com.example.gym_bro_rest_api.entities.Workout;
 import com.example.gym_bro_rest_api.entities.WorkoutPlan;
 import com.example.gym_bro_rest_api.mappers.ExerciseSetMapper;
+import com.example.gym_bro_rest_api.mappers.WorkoutMapper;
 import com.example.gym_bro_rest_api.model.ExerciseSetDTO;
 import com.example.gym_bro_rest_api.model.workout.WorkoutCreationDTO;
+import com.example.gym_bro_rest_api.model.workout.WorkoutViewDTO;
 import com.example.gym_bro_rest_api.repositories.WorkoutRepository;
+import com.example.gym_bro_rest_api.services.exercise.ExerciseServiceImpl;
 import com.example.gym_bro_rest_api.services.workoutplan.WorkoutPlanQueryService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -23,7 +28,8 @@ public class WorkoutServiceImpl implements WorkoutService {
     private final WorkoutPlanQueryService workoutPlanQueryService;
     private final WorkoutRepository workoutRepository;
     private final ExerciseSetService exerciseSetService;
-    private final ExerciseSetMapper exerciseSetMapper;
+    private final WorkoutMapper workoutMapper;
+
     @Override
     public Long saveNewWorkout(WorkoutCreationDTO workoutCreationDTO, User user) {
         WorkoutPlan workoutPlan = workoutPlanQueryService.getWorkoutPlanById(workoutCreationDTO.getWorkoutPlanId());
@@ -102,4 +108,24 @@ public class WorkoutServiceImpl implements WorkoutService {
 
         workoutRepository.delete(workout);
     }
+
+    @Override
+    public WorkoutViewDTO getWorkoutById(Long workoutId, User user) {
+        Workout workout = workoutRepository.findById(workoutId).orElseThrow(NotFoundException::new);
+
+        if (!user.equals(workout.getUser())) {
+            throw new NoAccessException();
+        }
+
+        return workoutMapper.workoutToWorkoutViewDTO(workout);
+    }
+
+    @Override
+    public Page<WorkoutViewDTO> listWorkoutsOfUser(User user, Integer pageNumber, Integer pageSize) {
+        PageRequest pageRequest = ExerciseServiceImpl.buildPageRequest(pageNumber, pageSize);
+        Page<Workout> workoutsPage = workoutRepository.findWorkoutsByUserId(user.getId(), pageRequest);
+
+        return workoutsPage.map(workoutMapper::workoutToWorkoutViewDTO);
+    }
+
 }

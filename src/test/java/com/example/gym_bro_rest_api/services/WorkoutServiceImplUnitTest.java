@@ -3,8 +3,10 @@ package com.example.gym_bro_rest_api.services;
 import com.example.gym_bro_rest_api.controller.NoAccessException;
 import com.example.gym_bro_rest_api.controller.NotFoundException;
 import com.example.gym_bro_rest_api.entities.*;
+import com.example.gym_bro_rest_api.model.ExerciseDTO;
 import com.example.gym_bro_rest_api.model.ExerciseSetDTO;
 import com.example.gym_bro_rest_api.model.workout.WorkoutCreationDTO;
+import com.example.gym_bro_rest_api.model.workout.WorkoutViewDTO;
 import com.example.gym_bro_rest_api.repositories.WorkoutPlanrepository;
 import com.example.gym_bro_rest_api.repositories.WorkoutRepository;
 import com.example.gym_bro_rest_api.services.workoutplan.WorkoutPlanQueryService;
@@ -15,9 +17,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
