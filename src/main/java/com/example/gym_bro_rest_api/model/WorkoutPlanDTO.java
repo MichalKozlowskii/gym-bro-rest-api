@@ -20,7 +20,6 @@ public class WorkoutPlanDTO {
     @NotBlank
     @NotNull
     private String name;
-    @NotNull
     private Long userId;
     private List<ExerciseDTO> exercises;
     private List<SetsReps> setsReps;
