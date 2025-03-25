@@ -23,7 +23,7 @@ public class Workout {
     @ManyToOne
     private WorkoutPlan workoutPlan;
 
-    @OneToMany
+    @OneToMany(mappedBy = "workout", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ExerciseSet> sets = new ArrayList<>();
 
     @ManyToOne

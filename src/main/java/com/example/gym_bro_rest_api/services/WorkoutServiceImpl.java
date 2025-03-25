@@ -35,7 +35,7 @@ public class WorkoutServiceImpl implements WorkoutService {
     public Long saveNewWorkout(WorkoutCreationDTO workoutCreationDTO, User user) {
         WorkoutPlan workoutPlan = workoutPlanQueryService.getWorkoutPlanById(workoutCreationDTO.getWorkoutPlanId());
 
-        if (!workoutPlan.getUser().equals(user)) {
+        if (!workoutPlan.getUser().getId().equals(user.getId())) {
             throw new NoAccessException();
         }
 
@@ -51,7 +51,7 @@ public class WorkoutServiceImpl implements WorkoutService {
     public Workout addNewSet(Long workoutId, ExerciseSetDTO exerciseSetDTO, User user) {
         Workout workout = workoutRepository.findById(workoutId).orElseThrow(NotFoundException::new);
 
-        if (!workout.getUser().equals(user)) {
+        if (!workout.getUser().getId().equals(user.getId())) {
             throw new NoAccessException();
         }
 
@@ -68,13 +68,13 @@ public class WorkoutServiceImpl implements WorkoutService {
     public Boolean deleteSet(Long workoutId, Long setId, User user) {
         Workout workout = workoutRepository.findById(workoutId).orElseThrow(NotFoundException::new);
 
-        if (!workout.getUser().equals(user)) {
+        if (!workout.getUser().getId().equals(user.getId())) {
             throw new NoAccessException();
         }
 
         ExerciseSet exerciseSet = exerciseSetService.getExerciseSetById(setId).orElseThrow(NotFoundException::new);
 
-        if (!exerciseSet.getUser().equals(user)) {
+        if (!exerciseSet.getUser().getId().equals(user.getId())) {
             throw new NoAccessException();
         }
 
@@ -97,7 +97,7 @@ public class WorkoutServiceImpl implements WorkoutService {
     public void deleteWorkoutById(Long workoutId, User user) {
         Workout workout = workoutRepository.findById(workoutId).orElseThrow(NotFoundException::new);
 
-        if (!workout.getUser().equals(user)) {
+        if (!workout.getUser().getId().equals(user.getId())) {
             throw new NoAccessException();
         }
 
@@ -114,7 +114,7 @@ public class WorkoutServiceImpl implements WorkoutService {
     public WorkoutViewDTO getWorkoutById(Long workoutId, User user) {
         Workout workout = workoutRepository.findById(workoutId).orElseThrow(NotFoundException::new);
 
-        if (!user.equals(workout.getUser())) {
+        if (!user.getId().equals(workout.getUser().getId())) {
             throw new NoAccessException();
         }
 

@@ -9,6 +9,5 @@ import lombok.Data;
 public class WorkoutCreationDTO {
     @NotNull
     private Long workoutPlanId;
-    @NotNull
     private Long userId;
 }
