@@ -43,7 +43,12 @@ public class WorkoutPlanServiceImpl implements WorkoutPlanService {
     }
     @Override
     public WorkoutPlanDTO saveNewWorkoutPlan(WorkoutPlanDTO workoutPlanDTO, User user) {
-        List<Exercise> exercises = convertExerciseDtoList(workoutPlanDTO.getExercises(), user);
+        List<Exercise> exercises;
+        if (workoutPlanDTO.getExercises() == null || workoutPlanDTO.getExercises().isEmpty()) {
+            exercises = new ArrayList<>();
+        } else {
+            exercises = convertExerciseDtoList(workoutPlanDTO.getExercises(), user);
+        }
 
         WorkoutPlan workoutPlan = WorkoutPlan.builder()
                 .name(workoutPlanDTO.getName())
