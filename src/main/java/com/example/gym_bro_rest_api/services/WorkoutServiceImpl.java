@@ -14,6 +14,7 @@ import com.example.gym_bro_rest_api.model.workout.WorkoutViewDTO;
 import com.example.gym_bro_rest_api.repositories.WorkoutRepository;
 import com.example.gym_bro_rest_api.services.exercise.ExerciseServiceImpl;
 import com.example.gym_bro_rest_api.services.workoutplan.WorkoutPlanQueryService;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;

@@ -5,6 +5,7 @@ import com.example.gym_bro_rest_api.model.ExerciseSetDTO;
 import com.example.gym_bro_rest_api.model.workout.WorkoutCreationDTO;
 import com.example.gym_bro_rest_api.model.workout.WorkoutViewDTO;
 import com.example.gym_bro_rest_api.services.WorkoutService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -21,7 +22,7 @@ public class WorkoutController {
     private final WorkoutService workoutService;
 
     @PostMapping("/create")
-    ResponseEntity<Map<String, String>> createNewWorkout(@RequestBody WorkoutCreationDTO workoutCreationDTO,
+    ResponseEntity<Map<String, String>> createNewWorkout(@Valid @RequestBody WorkoutCreationDTO workoutCreationDTO,
                                                          @AuthenticationPrincipal User user) {
 
         Long createdWorkoutId = workoutService.saveNewWorkout(workoutCreationDTO, user);
@@ -32,7 +33,7 @@ public class WorkoutController {
     }
 
     @PostMapping("/{workoutId}/addset")
-    ResponseEntity<Map<String, String>> addNewSet(@RequestBody ExerciseSetDTO exerciseSetDTO,
+    ResponseEntity<Map<String, String>> addNewSet(@Valid @RequestBody ExerciseSetDTO exerciseSetDTO,
                                                   @PathVariable("workoutId") Long workoutId,
                                                   @AuthenticationPrincipal User user) {
 
