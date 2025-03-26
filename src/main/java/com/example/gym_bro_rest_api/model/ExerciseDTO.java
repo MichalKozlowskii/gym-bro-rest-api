@@ -13,13 +13,11 @@ import java.time.LocalDateTime;
 public class ExerciseDTO {
     private Long id;
 
-    @NotNull
-    @NotBlank
+    @NotNull(message = "Name must not be null.")
+    @NotBlank(message = "Name must not be blank.")
     private String name;
 
     private String demonstrationUrl;
-
-    @NotNull
     private Long userId;
 
     private LocalDateTime creationDate;

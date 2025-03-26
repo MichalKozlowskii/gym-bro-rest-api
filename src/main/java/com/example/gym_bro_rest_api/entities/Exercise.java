@@ -20,14 +20,14 @@ public class Exercise {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank
-    @NotNull
+    @NotBlank(message = "Name must not be blank.")
+    @NotNull(message = "Name must not be null.")
     private String name;
 
     private String demonstrationUrl;
 
     @ManyToOne
-    @NotNull
+    @NotNull(message = "User must not be null.")
     private User user;
 
     @CreationTimestamp

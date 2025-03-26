@@ -10,5 +10,4 @@ import java.util.Optional;
 
 public interface ExerciseRepository extends JpaRepository<Exercise, Long> {
     Page<Exercise> findExercisesByUserId(Long id, Pageable pageable);
-    Boolean existsByIdAndUserId(Long id, Long userId);
 }

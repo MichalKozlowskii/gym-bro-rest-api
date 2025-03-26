@@ -7,6 +7,9 @@ import com.example.gym_bro_rest_api.entities.User;
 import com.example.gym_bro_rest_api.mappers.ExerciseMapper;
 import com.example.gym_bro_rest_api.model.ExerciseDTO;
 import com.example.gym_bro_rest_api.repositories.ExerciseRepository;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolationException;
+import jakarta.validation.Validator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -15,12 +18,14 @@ import org.springframework.stereotype.Service;
 
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
 public class ExerciseServiceImpl implements ExerciseService {
     private final ExerciseRepository exerciseRepository;
     private final ExerciseMapper exerciseMapper;
+    private final Validator validator;
 
     private final static int DEFAULT_PAGE = 0;
     private final static int DEFAULT_PAGE_SIZE = 10;
@@ -51,6 +56,12 @@ public class ExerciseServiceImpl implements ExerciseService {
 
             exercise.setName(exerciseDTO.getName());
             exercise.setDemonstrationUrl(exerciseDTO.getDemonstrationUrl());
+
+            Set<ConstraintViolation<Exercise>> violations = validator.validate(exercise);
+            if (!violations.isEmpty()) {
+                throw new ConstraintViolationException(violations);
+            }
+
             Exercise updated = exerciseRepository.save(exercise);
 
             return exerciseMapper.exerciseToExerciseDto(updated);
@@ -59,11 +70,9 @@ public class ExerciseServiceImpl implements ExerciseService {
 
     @Override
     public void deleteExerciseById(Long id, User user) {
-        if (!exerciseRepository.existsById(id)) {
-            throw new NotFoundException();
-        }
+        Exercise exercise = exerciseRepository.findById(id).orElseThrow(NotFoundException::new);
 
-        if (!exerciseRepository.existsByIdAndUserId(id, user.getId())) {
+        if (!user.getId().equals(exercise.getUser().getId())) {
             throw new NoAccessException();
         }
 
