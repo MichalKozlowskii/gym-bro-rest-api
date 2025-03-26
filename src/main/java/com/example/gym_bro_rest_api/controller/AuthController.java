@@ -5,6 +5,7 @@ import com.example.gym_bro_rest_api.model.UserDTO;
 import com.example.gym_bro_rest_api.services.JwtService;
 import com.example.gym_bro_rest_api.services.OAuth2UserService;
 import com.example.gym_bro_rest_api.services.UserService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -47,18 +48,10 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<Map<String, String>> register(@RequestBody UserDTO userDTO) {
+    public ResponseEntity<Map<String, String>> register(@Valid @RequestBody UserDTO userDTO) {
         if (userService.findUserByUsername(userDTO.getUsername()).orElse(null) != null) {
             return ResponseEntity.status(HttpStatus.CONFLICT)
                     .body(Map.of("error", "Username is already taken"));
-        }
-        if (userDTO.getUsername().isBlank() || userDTO.getUsername().isEmpty()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(Map.of("error", "Username can't be blank or empty."));
-        }
-        if (userDTO.getPassword().isBlank() || userDTO.getPassword().isEmpty() || userDTO.getPassword().length() < 7) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(Map.of("error", "Password must have at least 7 characters."));
         }
 
         userService.saveNewUser(userDTO);
