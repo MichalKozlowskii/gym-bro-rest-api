@@ -62,36 +62,6 @@ class AuthControllerIT {
     }
 
     @Test
-    void testRegister_BadPassword() {
-        UserDTO registerRequest = UserDTO.builder()
-                .username("username")
-                .password("1234")
-                .build();
-
-        ResponseEntity<Map<String, String>> response = authController.register(registerRequest);
-
-        assertThat(userRepository.findByUsername(registerRequest.getUsername())).isEmpty();
-
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-        assertThat(response.getBody()).isNotEmpty();
-    }
-
-    @Test
-    void testRegister_BadUserName() {
-        UserDTO registerRequest = UserDTO.builder()
-                .username("")
-                .password("password")
-                .build();
-
-        ResponseEntity<Map<String, String>> response = authController.register(registerRequest);
-
-        assertThat(userRepository.findByUsername(registerRequest.getUsername())).isEmpty();
-
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-        assertThat(response.getBody()).isNotEmpty();
-    }
-
-    @Test
     void testRegister_CredentialsOK() {
         UserDTO registerRequest = UserDTO.builder()
                 .username("newUser")

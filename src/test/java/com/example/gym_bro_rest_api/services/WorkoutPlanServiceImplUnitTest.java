@@ -10,6 +10,8 @@ import com.example.gym_bro_rest_api.model.ExerciseDTO;
 import com.example.gym_bro_rest_api.model.WorkoutPlanDTO;
 import com.example.gym_bro_rest_api.repositories.ExerciseRepository;
 import com.example.gym_bro_rest_api.repositories.WorkoutPlanrepository;
+import com.example.gym_bro_rest_api.services.exercise.ExerciseQueryService;
+import com.example.gym_bro_rest_api.services.workoutplan.WorkoutPlanServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -33,7 +35,7 @@ class WorkoutPlanServiceImplUnitTest {
     private WorkoutPlanrepository workoutPlanrepository;
 
     @Mock
-    private ExerciseRepository exerciseRepository;
+    private ExerciseQueryService exerciseQueryService;
 
     @InjectMocks
     private WorkoutPlanServiceImpl workoutPlanService;
@@ -67,7 +69,7 @@ class WorkoutPlanServiceImplUnitTest {
 
     @Test
     void saveNewWorkoutPlan_Success() {
-        given(exerciseRepository.findById(1L)).willReturn(Optional.of(exercise));
+        given(exerciseQueryService.getExerciseById(1L)).willReturn(exercise);
         given(workoutPlanrepository.save(any(WorkoutPlan.class))).willReturn(workoutPlan);
         given(workoutPlanMapper.workoutPlanToWorkoutPlanDto(any(WorkoutPlan.class)))
                 .willReturn(workoutPlanDTO);
@@ -81,7 +83,7 @@ class WorkoutPlanServiceImplUnitTest {
 
     @Test
     void saveNewWorkoutPlan_ExerciseNotFound() {
-        given(exerciseRepository.findById(1L)).willReturn(Optional.empty());
+        given(exerciseQueryService.getExerciseById(1L)).willThrow(NotFoundException.class);
 
         assertThrows(NotFoundException.class, () ->
                 workoutPlanService.saveNewWorkoutPlan(workoutPlanDTO, user));
@@ -93,7 +95,7 @@ class WorkoutPlanServiceImplUnitTest {
     void saveNewWorkoutPlan_NoAccessToExercise() {
         User anotherUser = User.builder().id(2L).build();
         Exercise anotherExercise = Exercise.builder().id(1L).user(anotherUser).build();
-        given(exerciseRepository.findById(1L)).willReturn(Optional.of(anotherExercise));
+        given(exerciseQueryService.getExerciseById(1L)).willReturn(anotherExercise);
 
         assertThrows(NoAccessException.class, () ->
                 workoutPlanService.saveNewWorkoutPlan(workoutPlanDTO, user));

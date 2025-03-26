@@ -6,19 +6,19 @@ import lombok.Builder;
 import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
 
+import java.time.LocalDateTime;
+
 @Builder
 @Data
 public class ExerciseDTO {
     private Long id;
 
-    @NotNull
-    @NotBlank
+    @NotNull(message = "Name must not be null.")
+    @NotBlank(message = "Name must not be blank.")
     private String name;
 
     private String demonstrationUrl;
-
-    @NotNull
     private Long userId;
 
-    private CreationTimestamp creationDate;
+    private LocalDateTime creationDate;
 }

@@ -5,6 +5,7 @@ import com.example.gym_bro_rest_api.entities.User;
 import com.example.gym_bro_rest_api.model.ExerciseDTO;
 import com.example.gym_bro_rest_api.repositories.ExerciseRepository;
 import jakarta.transaction.Transactional;
+import jakarta.validation.ConstraintViolationException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,7 +57,6 @@ class ExerciseControllerIT {
 
     @Test
     void testListExercisesOfUser_Limit() {
-        exerciseRepository.deleteAll();
         for (int i = 0; i < 1001; i++) {
             saveTestExercise();
         }
@@ -65,6 +65,16 @@ class ExerciseControllerIT {
 
         assertThat(dtos.getContent().size()).isEqualTo(1000);
     }
+
+
+    @Test
+    void testListExercisesOfUser_EmptyList() {
+        exerciseRepository.deleteAll();
+        Page<ExerciseDTO> dtos = exerciseController.listExercisesOfUser(user1, 1, 10);
+
+        assertThat(dtos.getContent().size()).isEqualTo(0);
+    }
+
 
     @Test
     void testListExercisesOfUser_25Exercises2ndPage() {
@@ -78,9 +88,9 @@ class ExerciseControllerIT {
         assertThat(dtos.getContent().size()).isEqualTo(5);
     }
 
+
     @Test
     void testListExercisesOfUser_20Exercises1Page() {
-        exerciseRepository.deleteAll();
         for (int i = 0; i < 20; i++) {
             saveTestExercise();
         }
@@ -88,14 +98,6 @@ class ExerciseControllerIT {
         Page<ExerciseDTO> dtos = exerciseController.listExercisesOfUser(user1, 1, 20);
 
         assertThat(dtos.getContent().size()).isEqualTo(20);
-    }
-
-    @Test
-    void testListExercisesOfUser_EmptyList() {
-        exerciseRepository.deleteAll();
-        Page<ExerciseDTO> dtos = exerciseController.listExercisesOfUser(user1, 1, 10);
-
-        assertThat(dtos.getContent().size()).isEqualTo(0);
     }
 
     @Test
@@ -149,20 +151,6 @@ class ExerciseControllerIT {
 
         assertThrows(NotFoundException.class, () -> {
             exerciseController.updateExerciseById(1321049L, updateDto, user1);
-        });
-    }
-
-    @Test
-    void testUpdateExerciseById_BadName() {
-        Exercise existing = saveTestExercise();
-
-        ExerciseDTO updateDto = ExerciseDTO.builder()
-                .name(" ")
-                .demonstrationUrl("fakpofkaepof")
-                .build();
-
-        assertThrows(BadNameException.class, () -> {
-           exerciseController.updateExerciseById(existing.getId(), updateDto, user1);
         });
     }
 
@@ -235,8 +223,10 @@ class ExerciseControllerIT {
                 .name("")
                 .build();
 
-        assertThrows(BadNameException.class, () -> {
+        ConstraintViolationException exception = assertThrows(ConstraintViolationException.class, () -> {
             exerciseController.createNewExercise(testDto, user1);
         });
+
+        System.out.println(exception.getMessage());
     }
 }

@@ -1,4 +1,4 @@
-package com.example.gym_bro_rest_api.services;
+package com.example.gym_bro_rest_api.services.workoutplan;
 
 import com.example.gym_bro_rest_api.controller.NoAccessException;
 import com.example.gym_bro_rest_api.controller.NotFoundException;
@@ -8,8 +8,9 @@ import com.example.gym_bro_rest_api.entities.WorkoutPlan;
 import com.example.gym_bro_rest_api.mappers.WorkoutPlanMapper;
 import com.example.gym_bro_rest_api.model.ExerciseDTO;
 import com.example.gym_bro_rest_api.model.WorkoutPlanDTO;
-import com.example.gym_bro_rest_api.repositories.ExerciseRepository;
 import com.example.gym_bro_rest_api.repositories.WorkoutPlanrepository;
+import com.example.gym_bro_rest_api.services.exercise.ExerciseQueryService;
+import com.example.gym_bro_rest_api.services.exercise.ExerciseServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -25,13 +26,12 @@ import java.util.Optional;
 public class WorkoutPlanServiceImpl implements WorkoutPlanService {
     private final WorkoutPlanMapper workoutPlanMapper;
     private final WorkoutPlanrepository workoutPlanrepository;
-    private final ExerciseRepository exerciseRepository;
+    private final ExerciseQueryService exerciseQueryService;
 
     private List<Exercise> convertExerciseDtoList(List<ExerciseDTO> list, User user) {
         return list.stream()
                 .map(exerciseDTO -> {
-                    Exercise exercise = exerciseRepository.findById(exerciseDTO.getId())
-                            .orElseThrow(NotFoundException::new);
+                    Exercise exercise = exerciseQueryService.getExerciseById(exerciseDTO.getId());
 
                     if (!exercise.getUser().getId().equals(user.getId())) {
                         throw new NoAccessException();
@@ -43,7 +43,12 @@ public class WorkoutPlanServiceImpl implements WorkoutPlanService {
     }
     @Override
     public WorkoutPlanDTO saveNewWorkoutPlan(WorkoutPlanDTO workoutPlanDTO, User user) {
-        List<Exercise> exercises = convertExerciseDtoList(workoutPlanDTO.getExercises(), user);
+        List<Exercise> exercises;
+        if (workoutPlanDTO.getExercises() == null || workoutPlanDTO.getExercises().isEmpty()) {
+            exercises = new ArrayList<>();
+        } else {
+            exercises = convertExerciseDtoList(workoutPlanDTO.getExercises(), user);
+        }
 
         WorkoutPlan workoutPlan = WorkoutPlan.builder()
                 .name(workoutPlanDTO.getName())

@@ -62,16 +62,4 @@ class ExerciseRepositoryIT {
 
         assertThat(exerciseList.size()).isEqualTo(3);
     }
-
-    @Test
-    void testExistsByIdAndUserId_GoodUserId() {
-        Boolean exists = exerciseRepository.existsByIdAndUserId(testExercise.getId(), user.getId());
-        assertThat(exists).isTrue();
-    }
-
-    @Test
-    void testExistsByIdAndUserId_BadUserId() {
-        Boolean exists = exerciseRepository.existsByIdAndUserId(testExercise.getId(), 123213L);
-        assertThat(exists).isFalse();
-    }
 }

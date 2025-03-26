@@ -7,7 +7,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -38,5 +38,5 @@ public class WorkoutPlan {
 
     @CreationTimestamp
     @Column(updatable = false)
-    private LocalDate creationDate;
+    private LocalDateTime creationDate;
 }
