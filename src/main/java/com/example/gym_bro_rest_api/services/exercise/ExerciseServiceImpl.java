@@ -25,8 +25,7 @@ import java.util.Set;
 public class ExerciseServiceImpl implements ExerciseService {
     private final ExerciseRepository exerciseRepository;
     private final ExerciseMapper exerciseMapper;
-    private final Validator validator;
-
+    
     private final static int DEFAULT_PAGE = 0;
     private final static int DEFAULT_PAGE_SIZE = 10;
 
@@ -56,11 +55,6 @@ public class ExerciseServiceImpl implements ExerciseService {
 
             exercise.setName(exerciseDTO.getName());
             exercise.setDemonstrationUrl(exerciseDTO.getDemonstrationUrl());
-
-            Set<ConstraintViolation<Exercise>> violations = validator.validate(exercise);
-            if (!violations.isEmpty()) {
-                throw new ConstraintViolationException(violations);
-            }
 
             Exercise updated = exerciseRepository.save(exercise);
 
