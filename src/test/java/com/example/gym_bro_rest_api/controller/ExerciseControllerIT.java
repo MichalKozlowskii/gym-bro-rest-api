@@ -66,6 +66,29 @@ class ExerciseControllerIT {
         assertThat(dtos.getContent().size()).isEqualTo(1000);
     }
 
+
+    @Test
+    void testListExercisesOfUser_EmptyList() {
+        exerciseRepository.deleteAll();
+        Page<ExerciseDTO> dtos = exerciseController.listExercisesOfUser(user1, 1, 10);
+
+        assertThat(dtos.getContent().size()).isEqualTo(0);
+    }
+
+
+    @Test
+    void testListExercisesOfUser_25Exercises2ndPage() {
+        exerciseRepository.deleteAll();
+        for (int i = 0; i < 25; i++) {
+            saveTestExercise();
+        }
+
+        Page<ExerciseDTO> dtos = exerciseController.listExercisesOfUser(user1, 2, 20);
+
+        assertThat(dtos.getContent().size()).isEqualTo(5);
+    }
+
+
     @Test
     void testListExercisesOfUser_20Exercises1Page() {
         for (int i = 0; i < 20; i++) {
