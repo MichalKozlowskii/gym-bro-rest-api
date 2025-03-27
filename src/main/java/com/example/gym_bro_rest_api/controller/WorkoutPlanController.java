@@ -3,6 +3,7 @@ package com.example.gym_bro_rest_api.controller;
 import com.example.gym_bro_rest_api.entities.User;
 import com.example.gym_bro_rest_api.model.WorkoutPlanDTO;
 import com.example.gym_bro_rest_api.services.workoutplan.WorkoutPlanService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -20,11 +21,8 @@ public class WorkoutPlanController {
     private final WorkoutPlanService workoutPlanService;
 
     @PostMapping("/create")
-    ResponseEntity<Map<String, String>> createNewWorkoutPlan(@RequestBody WorkoutPlanDTO workoutPlanDTO,
+    ResponseEntity<Map<String, String>> createNewWorkoutPlan(@Valid @RequestBody WorkoutPlanDTO workoutPlanDTO,
                                                              @AuthenticationPrincipal User user) {
-        if (workoutPlanDTO.getName().isEmpty() || workoutPlanDTO.getName().isBlank()) {
-            throw new BadNameException();
-        }
 
         Long workoutPlanId = workoutPlanService.saveNewWorkoutPlan(workoutPlanDTO, user).getId();
 
@@ -46,12 +44,8 @@ public class WorkoutPlanController {
 
     @PutMapping("/{workoutPlanId}")
     ResponseEntity<Map<String, String>> updateWorkoutPlanById(@PathVariable("workoutPlanId") Long id,
-                                                              @RequestBody WorkoutPlanDTO workoutPlanDTO,
+                                                              @Valid @RequestBody WorkoutPlanDTO workoutPlanDTO,
                                                               @AuthenticationPrincipal User user) {
-        if (workoutPlanDTO.getName().isEmpty() || workoutPlanDTO.getName().isBlank()) {
-            throw new BadNameException();
-        }
-
         workoutPlanService.updateWorkoutPlanById(id, workoutPlanDTO, user).orElseThrow(NotFoundException::new);
 
         return ResponseEntity.status(HttpStatus.OK)

@@ -4,6 +4,7 @@ import com.example.gym_bro_rest_api.controller.NoAccessException;
 import com.example.gym_bro_rest_api.controller.NotFoundException;
 import com.example.gym_bro_rest_api.entities.Exercise;
 import com.example.gym_bro_rest_api.entities.User;
+import com.example.gym_bro_rest_api.entities.Workout;
 import com.example.gym_bro_rest_api.entities.WorkoutPlan;
 import com.example.gym_bro_rest_api.mappers.WorkoutPlanMapper;
 import com.example.gym_bro_rest_api.model.ExerciseDTO;
@@ -43,10 +44,9 @@ public class WorkoutPlanServiceImpl implements WorkoutPlanService {
     }
     @Override
     public WorkoutPlanDTO saveNewWorkoutPlan(WorkoutPlanDTO workoutPlanDTO, User user) {
-        List<Exercise> exercises;
-        if (workoutPlanDTO.getExercises() == null || workoutPlanDTO.getExercises().isEmpty()) {
-            exercises = new ArrayList<>();
-        } else {
+        List<Exercise> exercises = new ArrayList<>();
+
+        if (workoutPlanDTO.getExercises() != null && !workoutPlanDTO.getExercises().isEmpty()) {
             exercises = convertExerciseDtoList(workoutPlanDTO.getExercises(), user);
         }
 
@@ -67,17 +67,21 @@ public class WorkoutPlanServiceImpl implements WorkoutPlanService {
     }
 
     @Override
-    public Optional<Object> updateWorkoutPlanById(Long id, WorkoutPlanDTO workoutPlanDTO, User user) {
+    public Optional<WorkoutPlanDTO> updateWorkoutPlanById(Long id, WorkoutPlanDTO workoutPlanDTO, User user) {
         return workoutPlanrepository.findById(id).map(workoutPlan -> {
             if (!Objects.equals(workoutPlan.getUser().getId(), user.getId())) {
                 throw new NoAccessException();
             }
 
-            List<Exercise> exercises = new ArrayList<>(convertExerciseDtoList(workoutPlanDTO.getExercises(), user));
+            List<Exercise> exercises = new ArrayList<>();
+
+            if (workoutPlanDTO.getExercises() != null && !workoutPlanDTO.getExercises().isEmpty()) {
+                exercises = new ArrayList<>(convertExerciseDtoList(workoutPlanDTO.getExercises(), user));
+            }
 
             workoutPlan.setName(workoutPlanDTO.getName());
             workoutPlan.setExercises(exercises);
-            workoutPlan.setSetsReps(new ArrayList<>(workoutPlanDTO.getSetsReps()));
+            workoutPlan.setSetsReps(workoutPlanDTO.getSetsReps());
             WorkoutPlan updated = workoutPlanrepository.save(workoutPlan);
 
             return workoutPlanMapper.workoutPlanToWorkoutPlanDto(updated);
