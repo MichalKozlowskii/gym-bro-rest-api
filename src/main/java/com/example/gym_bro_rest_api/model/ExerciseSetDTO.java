@@ -10,13 +10,13 @@ import java.time.LocalDateTime;
 @Data
 public class ExerciseSetDTO {
    private Long id;
-   @NotNull
+   @NotNull(message = "Exercise id must not be null.")
    private ExerciseDTO exercise;
    private Long workoutId;
    private Long userId;
-   @NotNull
+   @NotNull(message = "Weight must not be null.")
    private Double weight;
-   @NotNull
+   @NotNull(message = "Reps must not be null.")
    private Integer reps;
    private LocalDateTime creationDate;
 }
