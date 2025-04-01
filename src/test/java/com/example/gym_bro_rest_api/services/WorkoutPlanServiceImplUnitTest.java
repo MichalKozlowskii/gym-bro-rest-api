@@ -1,14 +1,13 @@
 package com.example.gym_bro_rest_api.services;
 
-import com.example.gym_bro_rest_api.controller.NoAccessException;
-import com.example.gym_bro_rest_api.controller.NotFoundException;
+import com.example.gym_bro_rest_api.controller.exceptions.NoAccessException;
+import com.example.gym_bro_rest_api.controller.exceptions.NotFoundException;
 import com.example.gym_bro_rest_api.entities.Exercise;
 import com.example.gym_bro_rest_api.entities.User;
 import com.example.gym_bro_rest_api.entities.WorkoutPlan;
 import com.example.gym_bro_rest_api.mappers.WorkoutPlanMapper;
 import com.example.gym_bro_rest_api.model.ExerciseDTO;
 import com.example.gym_bro_rest_api.model.WorkoutPlanDTO;
-import com.example.gym_bro_rest_api.repositories.ExerciseRepository;
 import com.example.gym_bro_rest_api.repositories.WorkoutPlanrepository;
 import com.example.gym_bro_rest_api.services.exercise.ExerciseQueryService;
 import com.example.gym_bro_rest_api.services.workoutplan.WorkoutPlanServiceImpl;
@@ -19,7 +18,6 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import java.util.List;
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;

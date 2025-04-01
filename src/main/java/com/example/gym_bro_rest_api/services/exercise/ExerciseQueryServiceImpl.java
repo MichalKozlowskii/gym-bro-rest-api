@@ -1,6 +1,6 @@
 package com.example.gym_bro_rest_api.services.exercise;
 
-import com.example.gym_bro_rest_api.controller.NotFoundException;
+import com.example.gym_bro_rest_api.controller.exceptions.NotFoundException;
 import com.example.gym_bro_rest_api.entities.Exercise;
 import com.example.gym_bro_rest_api.repositories.ExerciseRepository;
 import lombok.RequiredArgsConstructor;

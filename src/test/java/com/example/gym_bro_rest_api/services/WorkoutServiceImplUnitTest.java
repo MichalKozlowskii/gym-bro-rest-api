@@ -1,16 +1,12 @@
 package com.example.gym_bro_rest_api.services;
 
-import com.example.gym_bro_rest_api.controller.NoAccessException;
-import com.example.gym_bro_rest_api.controller.NotFoundException;
+import com.example.gym_bro_rest_api.controller.exceptions.NoAccessException;
+import com.example.gym_bro_rest_api.controller.exceptions.NotFoundException;
 import com.example.gym_bro_rest_api.entities.*;
-import com.example.gym_bro_rest_api.model.ExerciseDTO;
 import com.example.gym_bro_rest_api.model.ExerciseSetDTO;
 import com.example.gym_bro_rest_api.model.workout.WorkoutCreationDTO;
-import com.example.gym_bro_rest_api.model.workout.WorkoutViewDTO;
-import com.example.gym_bro_rest_api.repositories.WorkoutPlanrepository;
 import com.example.gym_bro_rest_api.repositories.WorkoutRepository;
 import com.example.gym_bro_rest_api.services.workoutplan.WorkoutPlanQueryService;
-import com.example.gym_bro_rest_api.services.workoutplan.WorkoutPlanServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -23,7 +19,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.willAnswer;
 import static org.mockito.Mockito.*;
 
 class WorkoutServiceImplUnitTest {

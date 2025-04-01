@@ -1,5 +1,7 @@
 package com.example.gym_bro_rest_api.controller;
 
+import com.example.gym_bro_rest_api.controller.exceptions.NoAccessException;
+import com.example.gym_bro_rest_api.controller.exceptions.NotFoundException;
 import com.example.gym_bro_rest_api.entities.*;
 import com.example.gym_bro_rest_api.model.ExerciseDTO;
 import com.example.gym_bro_rest_api.model.ExerciseSetDTO;
@@ -8,16 +10,12 @@ import com.example.gym_bro_rest_api.model.workout.WorkoutCreationDTO;
 import com.example.gym_bro_rest_api.model.workout.WorkoutViewDTO;
 import com.example.gym_bro_rest_api.repositories.*;
 import jakarta.transaction.Transactional;
-import lombok.RequiredArgsConstructor;
-import org.apache.coyote.BadRequestException;
-import org.apache.coyote.Response;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 
 import java.util.ArrayList;

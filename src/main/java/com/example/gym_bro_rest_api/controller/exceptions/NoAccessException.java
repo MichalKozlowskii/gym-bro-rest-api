@@ -1,4 +1,4 @@
-package com.example.gym_bro_rest_api.controller;
+package com.example.gym_bro_rest_api.controller.exceptions;
 
 public class NoAccessException extends RuntimeException {
     public NoAccessException() {

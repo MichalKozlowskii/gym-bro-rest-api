@@ -1,5 +1,7 @@
 package com.example.gym_bro_rest_api.controller;
 
+import com.example.gym_bro_rest_api.controller.exceptions.NoAccessException;
+import com.example.gym_bro_rest_api.controller.exceptions.NotFoundException;
 import com.example.gym_bro_rest_api.entities.Exercise;
 import com.example.gym_bro_rest_api.entities.User;
 import com.example.gym_bro_rest_api.model.ExerciseDTO;
@@ -13,6 +15,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
 
 import java.util.Map;
 
@@ -28,11 +33,18 @@ class ExerciseControllerIT {
     @Autowired
     ExerciseRepository exerciseRepository;
 
+    @Autowired
+    WebApplicationContext wac;
+
+    MockMvc mockMvc;
+
     User user1;
     User user2;
 
     @BeforeEach
     void setup() {
+        mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
+        
         user1 = User.builder()
                 .id(1L)
                 .username("test1")
@@ -44,6 +56,10 @@ class ExerciseControllerIT {
                 .username("test2")
                 .password("password2")
                 .build();
+    }
+
+    @Test
+    void testGetBeer() {
     }
 
     Exercise saveTestExercise() {

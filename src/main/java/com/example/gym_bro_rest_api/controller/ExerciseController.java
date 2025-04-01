@@ -1,5 +1,7 @@
 package com.example.gym_bro_rest_api.controller;
 
+import com.example.gym_bro_rest_api.controller.exceptions.NoAccessException;
+import com.example.gym_bro_rest_api.controller.exceptions.NotFoundException;
 import com.example.gym_bro_rest_api.entities.User;
 import com.example.gym_bro_rest_api.model.ExerciseDTO;
 import com.example.gym_bro_rest_api.services.exercise.ExerciseService;
