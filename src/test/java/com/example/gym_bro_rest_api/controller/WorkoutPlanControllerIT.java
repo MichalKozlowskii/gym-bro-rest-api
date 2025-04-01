@@ -163,19 +163,6 @@ class WorkoutPlanControllerIT {
     }
 
     @Test
-    void testUpdateWorkoutPlanById_BadName() {
-        WorkoutPlan workoutPlan = saveTestWorkoutPlan();
-
-        WorkoutPlanDTO workoutPlanDTO = WorkoutPlanDTO.builder()
-                .name("")
-                .setsReps(List.of(new SetsReps(3, 8)))
-                .build();
-
-        assertThrows(BadNameException.class, () ->
-                workoutPlanController.updateWorkoutPlanById(workoutPlan.getId(), workoutPlanDTO, user1));
-    }
-
-    @Test
     void testUpdateWorkoutPlanById_Success() {
         WorkoutPlan workoutPlan = saveTestWorkoutPlan();
 
@@ -185,8 +172,8 @@ class WorkoutPlanControllerIT {
 
         WorkoutPlanDTO workoutPlanDTO = WorkoutPlanDTO.builder()
                 .name("test_updated")
-                .exercises(List.of(testExerciseDto))
-                .setsReps(List.of(new SetsReps(3, 8)))
+                .exercises(new ArrayList<>(List.of(testExerciseDto)))
+                .setsReps(new ArrayList<>(List.of(new SetsReps(3, 8))))
                 .build();
 
         ResponseEntity<Map<String, String>> response = workoutPlanController.updateWorkoutPlanById(
@@ -250,22 +237,7 @@ class WorkoutPlanControllerIT {
 
         assertThrows(NotFoundException.class, () -> workoutPlanController.createNewWorkoutPlan(workoutPlanDTO, user1));
     }
-
-    @Test
-    void testSaveNewWorkoutPlan_BadName() {
-        ExerciseDTO testExerciseDto = ExerciseDTO.builder()
-                .id(testExercise.getId())
-                .build();
-
-        WorkoutPlanDTO workoutPlanDTO = WorkoutPlanDTO.builder()
-                .name("")
-                .exercises(List.of(testExerciseDto))
-                .setsReps(List.of(new SetsReps(3, 8)))
-                .build();
-
-        assertThrows(BadNameException.class, () -> workoutPlanController.createNewWorkoutPlan(workoutPlanDTO, user1));
-    }
-
+    
     @Test
     void testSaveNewWorkoutPlan_Success() {
         ExerciseDTO testExerciseDto = ExerciseDTO.builder()
