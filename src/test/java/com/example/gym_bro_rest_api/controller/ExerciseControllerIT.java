@@ -6,6 +6,9 @@ import com.example.gym_bro_rest_api.entities.Exercise;
 import com.example.gym_bro_rest_api.entities.User;
 import com.example.gym_bro_rest_api.model.ExerciseDTO;
 import com.example.gym_bro_rest_api.repositories.ExerciseRepository;
+import com.example.gym_bro_rest_api.repositories.UserRepository;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.nimbusds.common.contenttype.ContentType;
 import jakarta.transaction.Transactional;
 import jakarta.validation.ConstraintViolationException;
 import org.junit.jupiter.api.BeforeEach;
@@ -14,15 +17,26 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
+import static net.bytebuddy.matcher.ElementMatchers.is;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
 @Transactional
@@ -34,7 +48,13 @@ class ExerciseControllerIT {
     ExerciseRepository exerciseRepository;
 
     @Autowired
+    UserRepository userRepository;
+
+    @Autowired
     WebApplicationContext wac;
+
+    @Autowired
+    ObjectMapper objectMapper;
 
     MockMvc mockMvc;
 
@@ -45,21 +65,19 @@ class ExerciseControllerIT {
     void setup() {
         mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
         
-        user1 = User.builder()
-                .id(1L)
+        user1 = userRepository.save(User.builder()
                 .username("test1")
                 .password("password")
-                .build();
+                .build());
 
-        user2 = User.builder()
-                .id(2L)
+        user2 = userRepository.save(User.builder()
                 .username("test2")
                 .password("password2")
-                .build();
-    }
+                .build());
 
-    @Test
-    void testGetBeer() {
+        UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
+                user1, null, List.of(new SimpleGrantedAuthority("ROLE_USER")));
+        SecurityContextHolder.getContext().setAuthentication(auth);
     }
 
     Exercise saveTestExercise() {
@@ -69,6 +87,157 @@ class ExerciseControllerIT {
                 .build();
 
         return exerciseRepository.save(testExercise);
+    }
+
+    @Test
+    void testListExercisesOfUser_Web_2ndPage_10size() throws Exception {
+        for (int i = 0; i<20; i++) {
+            saveTestExercise();
+        }
+
+        mockMvc.perform(get("/api/exercise")
+                        .queryParam("pageNumber", "2")
+                        .queryParam("pageSize", "10")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content.size()").value(10));
+    }
+
+    @Test
+    void testListExercisesOfUser_Web_1page_20size() throws Exception {
+        for (int i = 0; i<20; i++) {
+            saveTestExercise();
+        }
+
+        mockMvc.perform(get("/api/exercise")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content.size()").value(20));
+    }
+
+    @Test
+    void testUpdateExerciseById_Web_ValidationFailed() throws Exception {
+        Exercise testExercise = saveTestExercise();
+        ExerciseDTO exerciseDTO = ExerciseDTO.builder().name(" ").demonstrationUrl("12321").build();
+
+        mockMvc.perform(put("/api/exercise/{id}", testExercise.getId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(exerciseDTO))
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errors.name").value("Name must not be blank."));
+        ;
+    }
+
+    @Test
+    void testUpdateExerciseById_Web_NoAccess() throws Exception {
+        Exercise testExercise = saveTestExercise();
+        ExerciseDTO exerciseDTO = ExerciseDTO.builder().name("Exercise 11").demonstrationUrl("12321").build();
+
+        UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
+                user2, null, List.of(new SimpleGrantedAuthority("ROLE_USER")));
+        SecurityContextHolder.getContext().setAuthentication(auth);
+
+        mockMvc.perform(put("/api/exercise/{id}", testExercise.getId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(exerciseDTO))
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isForbidden());
+
+    }
+
+    @Test
+    void testUpdateExerciseById_Web_NotFound() throws Exception {
+        ExerciseDTO exerciseDTO = ExerciseDTO.builder().name("Exercise 11").demonstrationUrl("12321").build();
+
+        mockMvc.perform(put("/api/exercise/{id}", 543252352L)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(exerciseDTO))
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void testUpdateExerciseById_Web_Success() throws Exception {
+        Exercise testExercise = saveTestExercise();
+        ExerciseDTO exerciseDTO = ExerciseDTO.builder().name("Exercise 11").demonstrationUrl("12321").build();
+
+        mockMvc.perform(put("/api/exercise/{id}", testExercise.getId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(exerciseDTO))
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+
+        mockMvc.perform(get("/api/exercise/{id}", testExercise.getId())
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(testExercise.getId()))
+                .andExpect(jsonPath("$.demonstrationUrl").value(testExercise.getDemonstrationUrl()))
+                .andExpect(jsonPath("$.name").value(exerciseDTO.getName()));
+
+    }
+
+    @Test
+    void testCreateNewExercise_Web_ValidationFailed() throws Exception {
+        ExerciseDTO exerciseDTO = ExerciseDTO.builder().name(" ").build();
+
+        mockMvc.perform(post("/api/exercise/create")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(exerciseDTO))
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errors.name").value("Name must not be blank."));
+    }
+
+    @Test
+    void testCreateNewExercise_Web_Success() throws Exception {
+        ExerciseDTO exerciseDTO = ExerciseDTO.builder().name("exercise 1").build();
+
+        mockMvc.perform(post("/api/exercise/create")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(new ObjectMapper().writeValueAsString(exerciseDTO))
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isCreated())
+                .andExpect(header().exists("Location"))
+                .andExpect(jsonPath("$.success").value("Exercise created."));
+    }
+
+    @Test
+    void testGetExerciseById_Web_NoAccess() throws Exception {
+        Exercise testExercise = saveTestExercise(); // Exercise belongs to user1
+
+        // Explicitly authenticate as user2
+        UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
+                user2, null, List.of(new SimpleGrantedAuthority("ROLE_USER")));
+        SecurityContextHolder.getContext().setAuthentication(auth);
+
+        mockMvc.perform(get("/api/exercise/{id}", testExercise.getId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void testGetExerciseById_Web_NotFound() throws Exception {
+        mockMvc.perform(get("/api/exercise/{id}", 13553151L)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void testGetExerciseById_Web_Success() throws Exception {
+        Exercise testExercise = saveTestExercise();
+
+        mockMvc.perform(get("/api/exercise/{id}", testExercise.getId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(testExercise.getId()))
+                .andExpect(jsonPath("$.name").value(testExercise.getName()));
     }
 
     @Test
