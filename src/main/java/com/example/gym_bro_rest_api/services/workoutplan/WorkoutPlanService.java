@@ -10,7 +10,7 @@ public interface WorkoutPlanService {
     WorkoutPlanDTO saveNewWorkoutPlan(WorkoutPlanDTO workoutPlanDTO, User user);
     Optional<WorkoutPlanDTO> getWorkoutPlanById(Long id);
 
-    Optional<Object> updateWorkoutPlanById(Long id, WorkoutPlanDTO workoutPlanDTO, User user);
+    Optional<WorkoutPlanDTO> updateWorkoutPlanById(Long id, WorkoutPlanDTO workoutPlanDTO, User user);
 
     void deleteWorkoutPlanById(Long id, User user);
 

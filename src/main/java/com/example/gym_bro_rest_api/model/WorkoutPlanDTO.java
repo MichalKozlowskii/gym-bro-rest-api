@@ -17,8 +17,8 @@ import java.util.List;
 @Data
 public class WorkoutPlanDTO {
     private Long id;
-    @NotBlank
-    @NotNull
+    @NotBlank(message = "Name must not be blank.")
+    @NotNull(message = "Name must not be null.")
     private String name;
     private Long userId;
     private List<ExerciseDTO> exercises;

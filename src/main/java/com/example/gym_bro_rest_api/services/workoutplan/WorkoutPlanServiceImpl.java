@@ -10,7 +10,7 @@ import com.example.gym_bro_rest_api.model.ExerciseDTO;
 import com.example.gym_bro_rest_api.model.WorkoutPlanDTO;
 import com.example.gym_bro_rest_api.repositories.WorkoutPlanrepository;
 import com.example.gym_bro_rest_api.services.exercise.ExerciseQueryService;
-import com.example.gym_bro_rest_api.services.exercise.ExerciseServiceImpl;
+import com.example.gym_bro_rest_api.services.utils.PaginationUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -43,10 +43,9 @@ public class WorkoutPlanServiceImpl implements WorkoutPlanService {
     }
     @Override
     public WorkoutPlanDTO saveNewWorkoutPlan(WorkoutPlanDTO workoutPlanDTO, User user) {
-        List<Exercise> exercises;
-        if (workoutPlanDTO.getExercises() == null || workoutPlanDTO.getExercises().isEmpty()) {
-            exercises = new ArrayList<>();
-        } else {
+        List<Exercise> exercises = new ArrayList<>();
+
+        if (workoutPlanDTO.getExercises() != null && !workoutPlanDTO.getExercises().isEmpty()) {
             exercises = convertExerciseDtoList(workoutPlanDTO.getExercises(), user);
         }
 
@@ -67,17 +66,21 @@ public class WorkoutPlanServiceImpl implements WorkoutPlanService {
     }
 
     @Override
-    public Optional<Object> updateWorkoutPlanById(Long id, WorkoutPlanDTO workoutPlanDTO, User user) {
+    public Optional<WorkoutPlanDTO> updateWorkoutPlanById(Long id, WorkoutPlanDTO workoutPlanDTO, User user) {
         return workoutPlanrepository.findById(id).map(workoutPlan -> {
             if (!Objects.equals(workoutPlan.getUser().getId(), user.getId())) {
                 throw new NoAccessException();
             }
 
-            List<Exercise> exercises = new ArrayList<>(convertExerciseDtoList(workoutPlanDTO.getExercises(), user));
+            List<Exercise> exercises = new ArrayList<>();
+
+            if (workoutPlanDTO.getExercises() != null && !workoutPlanDTO.getExercises().isEmpty()) {
+                exercises = new ArrayList<>(convertExerciseDtoList(workoutPlanDTO.getExercises(), user));
+            }
 
             workoutPlan.setName(workoutPlanDTO.getName());
             workoutPlan.setExercises(exercises);
-            workoutPlan.setSetsReps(new ArrayList<>(workoutPlanDTO.getSetsReps()));
+            workoutPlan.setSetsReps(workoutPlanDTO.getSetsReps());
             WorkoutPlan updated = workoutPlanrepository.save(workoutPlan);
 
             return workoutPlanMapper.workoutPlanToWorkoutPlanDto(updated);
@@ -99,7 +102,7 @@ public class WorkoutPlanServiceImpl implements WorkoutPlanService {
 
     @Override
     public Page<WorkoutPlanDTO> listExercisesOfUser(User user, Integer pageNumber, Integer pageSize) {
-        PageRequest pageRequest = ExerciseServiceImpl.buildPageRequest(pageNumber, pageSize);
+        PageRequest pageRequest = PaginationUtils.buildPageRequest(pageNumber, pageSize);
         Page<WorkoutPlan> workoutPlansPage = workoutPlanrepository.findWorkoutPlansByUserId(user.getId(), pageRequest);
 
         return workoutPlansPage.map(workoutPlanMapper::workoutPlanToWorkoutPlanDto);

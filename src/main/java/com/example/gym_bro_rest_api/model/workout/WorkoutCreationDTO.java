@@ -7,7 +7,7 @@ import lombok.Data;
 @Builder
 @Data
 public class WorkoutCreationDTO {
-    @NotNull
+    @NotNull(message = "Workout plan ID must not be null")
     private Long workoutPlanId;
     private Long userId;
 }
