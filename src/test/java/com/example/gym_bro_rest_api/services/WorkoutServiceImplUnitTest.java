@@ -251,7 +251,7 @@ class WorkoutServiceImplUnitTest {
     @Test
     void testDeleteSet_NoAccessToWorkout() {
         given(workoutRepository.findById(any(Long.class))).willReturn(Optional.of(Workout.builder()
-                .user(User.builder().build())
+                .user(User.builder().id(1000L).build())
                 .build()));
 
         assertThrows(NoAccessException.class, () -> workoutService.deleteSet(111L, 111L, user));
@@ -264,7 +264,7 @@ class WorkoutServiceImplUnitTest {
                 .build()));
 
         given(exerciseSetService.getExerciseSetById(any(Long.class))).willReturn(Optional.of(ExerciseSet.builder()
-                .user(User.builder().build())
+                .user(User.builder().id(1000L).build())
                 .build()));
 
         assertThrows(NoAccessException.class, () -> workoutService.deleteSet(111L, 111L, user));
