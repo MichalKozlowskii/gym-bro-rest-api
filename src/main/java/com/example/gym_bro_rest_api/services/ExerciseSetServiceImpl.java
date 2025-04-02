@@ -1,5 +1,7 @@
 package com.example.gym_bro_rest_api.services;
 
+import com.example.gym_bro_rest_api.controller.exceptions.NoAccessException;
+import com.example.gym_bro_rest_api.entities.Exercise;
 import com.example.gym_bro_rest_api.entities.ExerciseSet;
 import com.example.gym_bro_rest_api.entities.Workout;
 import com.example.gym_bro_rest_api.entities.WorkoutPlan;
@@ -19,8 +21,14 @@ public class ExerciseSetServiceImpl implements ExerciseSetService {
     private final ExerciseQueryService exerciseQueryService;
     @Override
     public ExerciseSet saveNewExerciseSet(ExerciseSetDTO exerciseSetDTO, Workout workout) {
+        Exercise exercise = exerciseQueryService.getExerciseById(exerciseSetDTO.getExercise().getId());
+
+        if (!exercise.getUser().getId().equals(workout.getUser().getId())) {
+            throw new NoAccessException();
+        }
+
         return exerciseSetRepository.save(ExerciseSet.builder()
-                        .exercise(exerciseQueryService.getExerciseById(exerciseSetDTO.getExercise().getId()))
+                        .exercise(exercise)
                         .user(workout.getUser())
                         .workout(workout)
                         .weight(exerciseSetDTO.getWeight())
