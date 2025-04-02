@@ -13,7 +13,6 @@ import com.example.gym_bro_rest_api.repositories.UserRepository;
 import com.example.gym_bro_rest_api.repositories.WorkoutPlanrepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
-import org.h2.server.web.WebApp;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
