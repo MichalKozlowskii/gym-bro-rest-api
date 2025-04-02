@@ -1,8 +1,10 @@
 package com.example.gym_bro_rest_api.controller;
 
+import com.example.gym_bro_rest_api.controller.exceptions.NoAccessException;
+import com.example.gym_bro_rest_api.controller.exceptions.NotFoundException;
 import com.example.gym_bro_rest_api.entities.User;
 import com.example.gym_bro_rest_api.model.WorkoutPlanDTO;
-import com.example.gym_bro_rest_api.services.workoutplan.WorkoutPlanService;
+import com.example.gym_bro_rest_api.services.WorkoutPlanService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;

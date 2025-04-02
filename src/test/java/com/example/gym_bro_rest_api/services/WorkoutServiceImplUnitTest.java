@@ -1,16 +1,12 @@
 package com.example.gym_bro_rest_api.services;
 
-import com.example.gym_bro_rest_api.controller.NoAccessException;
-import com.example.gym_bro_rest_api.controller.NotFoundException;
+import com.example.gym_bro_rest_api.controller.exceptions.NoAccessException;
+import com.example.gym_bro_rest_api.controller.exceptions.NotFoundException;
 import com.example.gym_bro_rest_api.entities.*;
-import com.example.gym_bro_rest_api.model.ExerciseDTO;
 import com.example.gym_bro_rest_api.model.ExerciseSetDTO;
 import com.example.gym_bro_rest_api.model.workout.WorkoutCreationDTO;
-import com.example.gym_bro_rest_api.model.workout.WorkoutViewDTO;
 import com.example.gym_bro_rest_api.repositories.WorkoutPlanrepository;
 import com.example.gym_bro_rest_api.repositories.WorkoutRepository;
-import com.example.gym_bro_rest_api.services.workoutplan.WorkoutPlanQueryService;
-import com.example.gym_bro_rest_api.services.workoutplan.WorkoutPlanServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -23,12 +19,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.willAnswer;
 import static org.mockito.Mockito.*;
 
 class WorkoutServiceImplUnitTest {
     @Mock
-    private WorkoutPlanQueryService workoutPlanQueryService;
+    private WorkoutPlanrepository workoutPlanrepository;
     @Mock
     private WorkoutRepository workoutRepository;
     @Mock
@@ -50,13 +45,12 @@ class WorkoutServiceImplUnitTest {
 
         workoutCreationDTO = WorkoutCreationDTO.builder()
                 .workoutPlanId(workoutPlan.getId())
-                .userId(user.getId())
                 .build();
     }
 
     @Test
     void testSaveNewWorkout_Success() {
-        given(workoutPlanQueryService.getWorkoutPlanById(any(Long.class))).willReturn(workoutPlan);
+        given(workoutPlanrepository.findById(any(Long.class))).willReturn(Optional.of(workoutPlan));
         given(workoutRepository.save(any(Workout.class))).willReturn(Workout.builder()
                 .id(1L)
                 .user(user)
@@ -65,7 +59,6 @@ class WorkoutServiceImplUnitTest {
 
         Long result = workoutService.saveNewWorkout(WorkoutCreationDTO.builder()
                 .workoutPlanId(workoutPlan.getId())
-                .userId(user.getId())
                 .build(), user);
 
         assertThat(result).isNotNull();
@@ -74,7 +67,7 @@ class WorkoutServiceImplUnitTest {
 
     @Test
     void testSaveNewWorkout_WorkoutPlanNotFound() {
-        given(workoutPlanQueryService.getWorkoutPlanById(any(Long.class))).willThrow(NotFoundException.class);
+        given(workoutPlanrepository.findById(any(Long.class))).willReturn(Optional.empty());
 
         assertThrows(NotFoundException.class, () ->
                 workoutService.saveNewWorkout(workoutCreationDTO, user));
@@ -87,7 +80,7 @@ class WorkoutServiceImplUnitTest {
         User anotherUser = User.builder().id(2L).build();
         WorkoutPlan anotherWorkoutPlan = WorkoutPlan.builder().id(2L).user(anotherUser).build();
 
-        given(workoutPlanQueryService.getWorkoutPlanById(any(Long.class))).willReturn(anotherWorkoutPlan);
+        given(workoutPlanrepository.findById(any(Long.class))).willReturn(Optional.of(anotherWorkoutPlan));
 
         assertThrows(NoAccessException.class, () ->
                 workoutService.saveNewWorkout(workoutCreationDTO, user));
@@ -251,7 +244,7 @@ class WorkoutServiceImplUnitTest {
     @Test
     void testDeleteSet_NoAccessToWorkout() {
         given(workoutRepository.findById(any(Long.class))).willReturn(Optional.of(Workout.builder()
-                .user(User.builder().build())
+                .user(User.builder().id(1000L).build())
                 .build()));
 
         assertThrows(NoAccessException.class, () -> workoutService.deleteSet(111L, 111L, user));
@@ -264,7 +257,7 @@ class WorkoutServiceImplUnitTest {
                 .build()));
 
         given(exerciseSetService.getExerciseSetById(any(Long.class))).willReturn(Optional.of(ExerciseSet.builder()
-                .user(User.builder().build())
+                .user(User.builder().id(1000L).build())
                 .build()));
 
         assertThrows(NoAccessException.class, () -> workoutService.deleteSet(111L, 111L, user));

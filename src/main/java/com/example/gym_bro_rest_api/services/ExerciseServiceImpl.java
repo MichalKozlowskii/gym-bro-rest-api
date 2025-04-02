@@ -1,7 +1,7 @@
-package com.example.gym_bro_rest_api.services.exercise;
+package com.example.gym_bro_rest_api.services;
 
-import com.example.gym_bro_rest_api.controller.NoAccessException;
-import com.example.gym_bro_rest_api.controller.NotFoundException;
+import com.example.gym_bro_rest_api.controller.exceptions.NoAccessException;
+import com.example.gym_bro_rest_api.controller.exceptions.NotFoundException;
 import com.example.gym_bro_rest_api.entities.Exercise;
 import com.example.gym_bro_rest_api.entities.User;
 import com.example.gym_bro_rest_api.mappers.ExerciseMapper;

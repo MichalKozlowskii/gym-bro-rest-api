@@ -1,7 +1,6 @@
-package com.example.gym_bro_rest_api.controller;
+package com.example.gym_bro_rest_api.controller.exceptions;
 
 import jakarta.validation.ConstraintViolationException;
-import jakarta.validation.ValidationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -25,9 +24,9 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
     }
 
-    @ExceptionHandler(BadNameException.class)
-    public ResponseEntity<String> handleBadName(BadNameException ex) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Name field empty or blank.");
+    @ExceptionHandler(InvalidExerciseException.class)
+    public ResponseEntity<String> handleInvalidExercise(InvalidExerciseException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
