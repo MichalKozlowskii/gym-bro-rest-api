@@ -13,7 +13,6 @@ import com.example.gym_bro_rest_api.model.workout.WorkoutViewDTO;
 import com.example.gym_bro_rest_api.repositories.WorkoutPlanrepository;
 import com.example.gym_bro_rest_api.repositories.WorkoutRepository;
 import com.example.gym_bro_rest_api.services.utils.PaginationUtils;
-import com.example.gym_bro_rest_api.services.workoutplan.WorkoutPlanQueryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
