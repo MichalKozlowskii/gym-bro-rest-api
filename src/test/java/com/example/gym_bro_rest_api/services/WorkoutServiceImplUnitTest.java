@@ -45,7 +45,6 @@ class WorkoutServiceImplUnitTest {
 
         workoutCreationDTO = WorkoutCreationDTO.builder()
                 .workoutPlanId(workoutPlan.getId())
-                .userId(user.getId())
                 .build();
     }
 
@@ -60,7 +59,6 @@ class WorkoutServiceImplUnitTest {
 
         Long result = workoutService.saveNewWorkout(WorkoutCreationDTO.builder()
                 .workoutPlanId(workoutPlan.getId())
-                .userId(user.getId())
                 .build(), user);
 
         assertThat(result).isNotNull();
