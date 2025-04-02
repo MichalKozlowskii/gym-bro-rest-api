@@ -14,7 +14,6 @@ import com.example.gym_bro_rest_api.repositories.WorkoutPlanrepository;
 import com.example.gym_bro_rest_api.repositories.WorkoutRepository;
 import com.example.gym_bro_rest_api.services.utils.PaginationUtils;
 import lombok.RequiredArgsConstructor;
-import org.apache.coyote.BadRequestException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -47,7 +46,7 @@ public class WorkoutServiceImpl implements WorkoutService {
     }
 
     @Override
-    public Workout addNewSet(Long workoutId, ExerciseSetDTO exerciseSetDTO, User user) throws BadRequestException {
+    public Workout addNewSet(Long workoutId, ExerciseSetDTO exerciseSetDTO, User user) {
         Workout workout = workoutRepository.findById(workoutId).orElseThrow(NotFoundException::new);
 
         if (!workout.getUser().getId().equals(user.getId())) {

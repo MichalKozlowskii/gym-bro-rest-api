@@ -1,5 +1,6 @@
 package com.example.gym_bro_rest_api.services;
 
+import com.example.gym_bro_rest_api.controller.exceptions.InvalidExerciseException;
 import com.example.gym_bro_rest_api.controller.exceptions.NoAccessException;
 import com.example.gym_bro_rest_api.controller.exceptions.NotFoundException;
 import com.example.gym_bro_rest_api.entities.Exercise;
@@ -20,7 +21,7 @@ public class ExerciseSetServiceImpl implements ExerciseSetService {
     private final ExerciseSetRepository exerciseSetRepository;
     private final ExerciseRepository exerciseRepository;
     @Override
-    public ExerciseSet saveNewExerciseSet(ExerciseSetDTO exerciseSetDTO, Workout workout) throws BadRequestException {
+    public ExerciseSet saveNewExerciseSet(ExerciseSetDTO exerciseSetDTO, Workout workout) {
         Exercise exercise = exerciseRepository.findById(exerciseSetDTO.getExercise().getId())
                 .orElseThrow(NotFoundException::new);
 
@@ -32,7 +33,7 @@ public class ExerciseSetServiceImpl implements ExerciseSetService {
                 .anyMatch(e -> e.getId().equals(exercise.getId()));
 
         if (!isInWorkoutPlan) {
-            throw new BadRequestException("The exercise is not part of the workout plan");
+            throw new InvalidExerciseException("Exercise with id " + exercise.getId() + " is not part of the workout plan.");
         }
 
         return exerciseSetRepository.save(ExerciseSet.builder()

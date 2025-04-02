@@ -5,12 +5,11 @@ import com.example.gym_bro_rest_api.entities.Workout;
 import com.example.gym_bro_rest_api.model.ExerciseSetDTO;
 import com.example.gym_bro_rest_api.model.workout.WorkoutCreationDTO;
 import com.example.gym_bro_rest_api.model.workout.WorkoutViewDTO;
-import org.apache.coyote.BadRequestException;
 import org.springframework.data.domain.Page;
 
 public interface WorkoutService {
     Long saveNewWorkout(WorkoutCreationDTO workoutCreationDTO, User user);
-    Workout addNewSet(Long workoutId, ExerciseSetDTO exerciseSetDTO, User user) throws BadRequestException;
+    Workout addNewSet(Long workoutId, ExerciseSetDTO exerciseSetDTO, User user);
     Boolean deleteSet(Long workoutId, Long setId, User user);
     void deleteWorkoutById(Long workoutId, User user);
     WorkoutViewDTO getWorkoutById(Long workoutId, User user);
