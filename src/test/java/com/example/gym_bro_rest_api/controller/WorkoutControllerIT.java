@@ -148,11 +148,105 @@ class WorkoutControllerIT {
                 .build());
     }
 
-   /* @Test
+    @Test
+    void testDeleteWorkoutById_Web_NoAccess() throws Exception {
+        Workout testWorkout = saveTestWorkout();
+
+        UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
+                anotherUser, null, List.of(new SimpleGrantedAuthority("ROLE_USER")));
+        SecurityContextHolder.getContext().setAuthentication(auth);
+
+        mockMvc.perform(delete("/api/workout/{workoutId}", testWorkout.getId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void testDeleteWorkoutById_Web_NotFound() throws Exception {
+        mockMvc.perform(delete("/api/workout/{workoutId}", 1412412421421L)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
+    }
+    @Test
+    void testDeleteWorkoutById_Web_Success() throws Exception {
+        Workout testWorkout = saveTestWorkout();
+        ExerciseSet exerciseSet = exerciseSetRepository.save(ExerciseSet.builder()
+                .workout(testWorkout)
+                .user(user)
+                .weight(60.)
+                .reps(8)
+                .exercise(exercise1)
+                .build());
+
+        testWorkout.getSets().add(exerciseSet);
+
+        mockMvc.perform(delete("/api/workout/{workoutId}", testWorkout.getId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void testDeleteSet_Web_NoAccess() throws Exception {
+        Workout testWorkout = saveTestWorkout();
+        ExerciseSet exerciseSet = exerciseSetRepository.save(ExerciseSet.builder()
+                .workout(testWorkout)
+                .user(user)
+                .weight(60.)
+                .reps(8)
+                .exercise(exercise1)
+                .build());
+
+        testWorkout.getSets().add(exerciseSet);
+
+        UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
+                anotherUser, null, List.of(new SimpleGrantedAuthority("ROLE_USER")));
+        SecurityContextHolder.getContext().setAuthentication(auth);
+
+        mockMvc.perform(delete("/api/workout/{workoutId}/deleteset/{setId}", testWorkout.getId(), exerciseSet.getId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void testDeleteSet_Web_SetNotFound() throws Exception {
+        Workout testWorkout = saveTestWorkout();
+
+        mockMvc.perform(delete("/api/workout/{workoutId}/deleteset/{setId}", testWorkout.getId(), 151351315L)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void testDeleteSet_Web_WorkoutNotFound() throws Exception {
+        mockMvc.perform(delete("/api/workout/{workoutId}/deleteset/{setId}", 41421412L, 151351315L)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
     void testDeleteSet_Web_Success() throws Exception {
         Workout testWorkout = saveTestWorkout();
-        ExerciseSet
-    }*/
+        ExerciseSet exerciseSet = exerciseSetRepository.save(ExerciseSet.builder()
+                        .workout(testWorkout)
+                        .user(user)
+                        .weight(60.)
+                        .reps(8)
+                        .exercise(exercise1)
+                .build());
+
+        testWorkout.getSets().add(exerciseSet);
+
+        mockMvc.perform(delete("/api/workout/{workoutId}/deleteset/{setId}", testWorkout.getId(), exerciseSet.getId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+    }
 
     @Test
     void testAddNewSet_Web_NoAccessExercise() throws Exception {
