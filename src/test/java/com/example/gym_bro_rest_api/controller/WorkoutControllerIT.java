@@ -1,5 +1,6 @@
 package com.example.gym_bro_rest_api.controller;
 
+import com.example.gym_bro_rest_api.controller.exceptions.InvalidExerciseException;
 import com.example.gym_bro_rest_api.controller.exceptions.NoAccessException;
 import com.example.gym_bro_rest_api.controller.exceptions.NotFoundException;
 import com.example.gym_bro_rest_api.entities.*;
@@ -147,6 +148,12 @@ class WorkoutControllerIT {
                 .build());
     }
 
+   /* @Test
+    void testDeleteSet_Web_Success() throws Exception {
+        Workout testWorkout = saveTestWorkout();
+        ExerciseSet
+    }*/
+
     @Test
     void testAddNewSet_Web_NoAccessExercise() throws Exception {
         Workout testWorkout = saveTestWorkout();
@@ -184,6 +191,29 @@ class WorkoutControllerIT {
                         .content(objectMapper.writeValueAsString(exerciseSetDTO))
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void testAddNewSet_Web_ExerciseNotInWorkoutPlan() throws Exception {
+        Workout testWorkout = saveTestWorkout();
+
+        Exercise exercise = exerciseRepository.save(Exercise.builder()
+                .name("areawqra")
+                .user(user)
+                .demonstrationUrl("fafeafasdz")
+                .build());
+
+        ExerciseSetDTO exerciseSetDTO = ExerciseSetDTO.builder()
+                .exercise(ExerciseDTO.builder().id(exercise.getId()).build())
+                .weight(70.)
+                .reps(8)
+                .build();
+
+        mockMvc.perform(post("/api/workout/{workoutId}/addset", testWorkout.getId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(exerciseSetDTO))
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
     }
 
     @Test
@@ -341,17 +371,48 @@ class WorkoutControllerIT {
     }
 
     @Test
-    void testAddSet_WorkoutNotFound() {
+    void testAddNewSet_WorkoutNotFound() {
         assertThrows(NotFoundException.class, () ->
                 workoutController.addNewSet(exerciseSetDTO, 1313112344L, user));
     }
 
     @Test
-    void testAddSet_NoAccessToWorkout() {
+    void testAddNewSet_NoAccessToWorkout() {
         Workout workout = saveTestWorkout();
 
         assertThrows(NoAccessException.class, () ->
                 workoutController.addNewSet(exerciseSetDTO, workout.getId(), anotherUser));
+    }
+
+    @Test
+    void testAddNewSet_ExerciseNotFound() {
+        Workout workout = saveTestWorkout();
+        ExerciseSetDTO exerciseSetDTO = ExerciseSetDTO.builder()
+                .exercise(ExerciseDTO.builder().id(1421412412414L).build())
+                .build();
+
+        assertThrows(NotFoundException.class, () ->
+                workoutController.addNewSet(exerciseSetDTO, workout.getId(), user));
+    }
+
+    @Test
+    void testAddNewSet_ExerciseNotInWorkoutPlan() {
+        Workout testWorkout = saveTestWorkout();
+
+        Exercise exercise = exerciseRepository.save(Exercise.builder()
+                .name("areawqra")
+                .user(user)
+                .demonstrationUrl("fafeafasdz")
+                .build());
+
+        ExerciseSetDTO exerciseSetDTO = ExerciseSetDTO.builder()
+                .exercise(ExerciseDTO.builder().id(exercise.getId()).build())
+                .weight(70.)
+                .reps(8)
+                .build();
+
+        assertThrows(InvalidExerciseException.class, () ->
+                workoutController.addNewSet(exerciseSetDTO, testWorkout.getId(), user));
     }
 
     @Test
