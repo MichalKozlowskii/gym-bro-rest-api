@@ -10,6 +10,7 @@ import com.example.gym_bro_rest_api.mappers.WorkoutMapper;
 import com.example.gym_bro_rest_api.model.ExerciseSetDTO;
 import com.example.gym_bro_rest_api.model.workout.WorkoutCreationDTO;
 import com.example.gym_bro_rest_api.model.workout.WorkoutViewDTO;
+import com.example.gym_bro_rest_api.repositories.WorkoutPlanrepository;
 import com.example.gym_bro_rest_api.repositories.WorkoutRepository;
 import com.example.gym_bro_rest_api.services.utils.PaginationUtils;
 import com.example.gym_bro_rest_api.services.workoutplan.WorkoutPlanQueryService;
@@ -23,14 +24,15 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class WorkoutServiceImpl implements WorkoutService {
-    private final WorkoutPlanQueryService workoutPlanQueryService;
+    private final WorkoutPlanrepository workoutPlanrepository;
     private final WorkoutRepository workoutRepository;
     private final ExerciseSetService exerciseSetService;
     private final WorkoutMapper workoutMapper;
 
     @Override
     public Long saveNewWorkout(WorkoutCreationDTO workoutCreationDTO, User user) {
-        WorkoutPlan workoutPlan = workoutPlanQueryService.getWorkoutPlanById(workoutCreationDTO.getWorkoutPlanId());
+        WorkoutPlan workoutPlan = workoutPlanrepository.findById(workoutCreationDTO.getWorkoutPlanId())
+                .orElseThrow(NotFoundException::new);
 
         if (!workoutPlan.getUser().getId().equals(user.getId())) {
             throw new NoAccessException();

@@ -1,4 +1,4 @@
-package com.example.gym_bro_rest_api.services.workoutplan;
+package com.example.gym_bro_rest_api.services;
 
 import com.example.gym_bro_rest_api.controller.exceptions.NoAccessException;
 import com.example.gym_bro_rest_api.controller.exceptions.NotFoundException;
@@ -10,7 +10,6 @@ import com.example.gym_bro_rest_api.model.ExerciseDTO;
 import com.example.gym_bro_rest_api.model.WorkoutPlanDTO;
 import com.example.gym_bro_rest_api.repositories.ExerciseRepository;
 import com.example.gym_bro_rest_api.repositories.WorkoutPlanrepository;
-import com.example.gym_bro_rest_api.services.exercise.ExerciseQueryService;
 import com.example.gym_bro_rest_api.services.utils.PaginationUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;

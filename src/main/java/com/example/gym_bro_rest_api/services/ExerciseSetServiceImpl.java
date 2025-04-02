@@ -10,7 +10,6 @@ import com.example.gym_bro_rest_api.mappers.ExerciseSetMapper;
 import com.example.gym_bro_rest_api.model.ExerciseSetDTO;
 import com.example.gym_bro_rest_api.repositories.ExerciseRepository;
 import com.example.gym_bro_rest_api.repositories.ExerciseSetRepository;
-import com.example.gym_bro_rest_api.services.exercise.ExerciseQueryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

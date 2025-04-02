@@ -11,14 +11,12 @@ import com.example.gym_bro_rest_api.model.WorkoutPlanDTO;
 import com.example.gym_bro_rest_api.repositories.ExerciseRepository;
 import com.example.gym_bro_rest_api.repositories.WorkoutPlanrepository;
 import com.example.gym_bro_rest_api.services.exercise.ExerciseQueryService;
-import com.example.gym_bro_rest_api.services.workoutplan.WorkoutPlanServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import javax.swing.text.html.Option;
 import java.util.List;
 import java.util.Optional;
 
