@@ -8,6 +8,7 @@ import com.example.gym_bro_rest_api.entities.WorkoutPlan;
 import com.example.gym_bro_rest_api.mappers.WorkoutPlanMapper;
 import com.example.gym_bro_rest_api.model.ExerciseDTO;
 import com.example.gym_bro_rest_api.model.WorkoutPlanDTO;
+import com.example.gym_bro_rest_api.repositories.ExerciseRepository;
 import com.example.gym_bro_rest_api.repositories.WorkoutPlanrepository;
 import com.example.gym_bro_rest_api.services.exercise.ExerciseQueryService;
 import com.example.gym_bro_rest_api.services.utils.PaginationUtils;
@@ -26,12 +27,13 @@ import java.util.Optional;
 public class WorkoutPlanServiceImpl implements WorkoutPlanService {
     private final WorkoutPlanMapper workoutPlanMapper;
     private final WorkoutPlanrepository workoutPlanrepository;
-    private final ExerciseQueryService exerciseQueryService;
+    private final ExerciseRepository exerciseRepository;
 
     private List<Exercise> convertExerciseDtoList(List<ExerciseDTO> list, User user) {
         return list.stream()
                 .map(exerciseDTO -> {
-                    Exercise exercise = exerciseQueryService.getExerciseById(exerciseDTO.getId());
+                    Exercise exercise = exerciseRepository.findById(exerciseDTO.getId())
+                            .orElseThrow(NotFoundException::new);
 
                     if (!exercise.getUser().getId().equals(user.getId())) {
                         throw new NoAccessException();

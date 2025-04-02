@@ -1,4 +1,4 @@
-package com.example.gym_bro_rest_api.services.exercise;
+package com.example.gym_bro_rest_api.services;
 
 import com.example.gym_bro_rest_api.controller.exceptions.NoAccessException;
 import com.example.gym_bro_rest_api.controller.exceptions.NotFoundException;

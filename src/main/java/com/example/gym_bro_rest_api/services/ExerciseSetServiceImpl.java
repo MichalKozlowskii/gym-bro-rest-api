@@ -1,12 +1,14 @@
 package com.example.gym_bro_rest_api.services;
 
 import com.example.gym_bro_rest_api.controller.exceptions.NoAccessException;
+import com.example.gym_bro_rest_api.controller.exceptions.NotFoundException;
 import com.example.gym_bro_rest_api.entities.Exercise;
 import com.example.gym_bro_rest_api.entities.ExerciseSet;
 import com.example.gym_bro_rest_api.entities.Workout;
 import com.example.gym_bro_rest_api.entities.WorkoutPlan;
 import com.example.gym_bro_rest_api.mappers.ExerciseSetMapper;
 import com.example.gym_bro_rest_api.model.ExerciseSetDTO;
+import com.example.gym_bro_rest_api.repositories.ExerciseRepository;
 import com.example.gym_bro_rest_api.repositories.ExerciseSetRepository;
 import com.example.gym_bro_rest_api.services.exercise.ExerciseQueryService;
 import lombok.RequiredArgsConstructor;
@@ -18,10 +20,11 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class ExerciseSetServiceImpl implements ExerciseSetService {
     private final ExerciseSetRepository exerciseSetRepository;
-    private final ExerciseQueryService exerciseQueryService;
+    private final ExerciseRepository exerciseRepository;
     @Override
     public ExerciseSet saveNewExerciseSet(ExerciseSetDTO exerciseSetDTO, Workout workout) {
-        Exercise exercise = exerciseQueryService.getExerciseById(exerciseSetDTO.getExercise().getId());
+        Exercise exercise = exerciseRepository.findById(exerciseSetDTO.getExercise().getId())
+                .orElseThrow(NotFoundException::new);
 
         if (!exercise.getUser().getId().equals(workout.getUser().getId())) {
             throw new NoAccessException();

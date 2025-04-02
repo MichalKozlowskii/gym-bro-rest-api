@@ -4,7 +4,7 @@ import com.example.gym_bro_rest_api.controller.exceptions.NoAccessException;
 import com.example.gym_bro_rest_api.controller.exceptions.NotFoundException;
 import com.example.gym_bro_rest_api.entities.User;
 import com.example.gym_bro_rest_api.model.ExerciseDTO;
-import com.example.gym_bro_rest_api.services.exercise.ExerciseService;
+import com.example.gym_bro_rest_api.services.ExerciseService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
