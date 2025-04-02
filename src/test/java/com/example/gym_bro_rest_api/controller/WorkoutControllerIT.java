@@ -6,9 +6,11 @@ import com.example.gym_bro_rest_api.entities.*;
 import com.example.gym_bro_rest_api.model.ExerciseDTO;
 import com.example.gym_bro_rest_api.model.ExerciseSetDTO;
 import com.example.gym_bro_rest_api.model.SetsReps;
+import com.example.gym_bro_rest_api.model.WorkoutPlanDTO;
 import com.example.gym_bro_rest_api.model.workout.WorkoutCreationDTO;
 import com.example.gym_bro_rest_api.model.workout.WorkoutViewDTO;
 import com.example.gym_bro_rest_api.repositories.*;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -16,13 +18,23 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 
 @SpringBootTest
@@ -46,6 +58,14 @@ class WorkoutControllerIT {
     @Autowired
     UserRepository userRepository;
 
+    @Autowired
+    WebApplicationContext wac;
+
+    @Autowired
+    ObjectMapper objectMapper;
+
+    MockMvc mockMvc;
+
     User user;
     User anotherUser;
     Exercise exercise1;
@@ -56,6 +76,8 @@ class WorkoutControllerIT {
 
     @BeforeEach
     void setup() {
+        mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
+
         user = userRepository.save(User.builder()
                 .username("test_user")
                 .password("password")
@@ -111,6 +133,10 @@ class WorkoutControllerIT {
                 .weight(70.)
                 .reps(8)
                 .build();
+
+        UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
+                user, null, List.of(new SimpleGrantedAuthority("ROLE_USER")));
+        SecurityContextHolder.getContext().setAuthentication(auth);
     }
 
     Workout saveTestWorkout() {
@@ -119,6 +145,66 @@ class WorkoutControllerIT {
                 .workoutPlan(workoutPlan)
                 .sets(new ArrayList<>())
                 .build());
+    }
+
+    @Test
+    void testCreateNewWorkout_Web_ValidationFailed() throws Exception {
+        WorkoutCreationDTO workoutCreationDTO = WorkoutCreationDTO.builder().build();
+
+        mockMvc.perform(post("/api/workout/create")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(workoutCreationDTO))
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errors.workoutPlanId").value("Workout plan ID must not be null"));
+    }
+
+    @Test
+    void testCreateNewWorkout_Web_Success() throws Exception {
+        WorkoutCreationDTO workoutCreationDTO = WorkoutCreationDTO.builder()
+                .workoutPlanId(workoutPlan.getId())
+                .build();
+
+        mockMvc.perform(post("/api/workout/create")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(workoutCreationDTO))
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isCreated())
+                .andExpect(header().exists("Location"))
+                .andExpect(jsonPath("$.success").value("Workout created."));
+    }
+
+    @Test
+    void testGetWorkoutById_Web_NoAccess() throws Exception {
+        Workout testWorkout = saveTestWorkout();
+
+        UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
+                anotherUser, null, List.of(new SimpleGrantedAuthority("ROLE_USER")));
+        SecurityContextHolder.getContext().setAuthentication(auth);
+
+        mockMvc.perform(get("/api/workout/{id}", testWorkout.getId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void testGetWorkoutById_Web_NotFound() throws Exception {
+        mockMvc.perform(get("/api/workout/{id}", 13553151L)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void testGetWorkoutById_Web_Success() throws Exception {
+        Workout testWorkout = saveTestWorkout();
+
+        mockMvc.perform(get("/api/workout/{id}", testWorkout.getId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(testWorkout.getId()));
     }
 
     @Test
