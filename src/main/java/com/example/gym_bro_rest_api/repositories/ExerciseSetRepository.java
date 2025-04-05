@@ -6,14 +6,15 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface ExerciseSetRepository extends JpaRepository<ExerciseSet, Long> {
-    ExerciseSet findTopByExerciseIdOrderByRepsDesc(Long exerciseId);
-    ExerciseSet findTopByExerciseIdOrderByRepsAsc(Long exerciseId);
-    ExerciseSet findTopByExerciseIdOrderByWeightDesc(Long exerciseId);
-    ExerciseSet findTopByExerciseIdOrderByWeightAsc(Long exerciseId);
-    ExerciseSet findTopByExerciseIdOrderByCreationDateDesc(Long exerciseId);
-    ExerciseSet findTopByExerciseIdOrderByCreationDateAsc(Long exerciseId);
+    Optional<ExerciseSet> findTopByExerciseIdOrderByRepsDesc(Long exerciseId);
+    Optional<ExerciseSet> findTopByExerciseIdOrderByRepsAsc(Long exerciseId);
+    Optional<ExerciseSet> findTopByExerciseIdOrderByWeightDesc(Long exerciseId);
+    Optional<ExerciseSet> findTopByExerciseIdOrderByWeightAsc(Long exerciseId);
+    Optional<ExerciseSet> findTopByExerciseIdOrderByCreationDateDesc(Long exerciseId);
+    Optional<ExerciseSet> findTopByExerciseIdOrderByCreationDateAsc(Long exerciseId);
     @Query("""
     SELECT s FROM ExerciseSet s
     WHERE s.exercise.id = :exerciseId
