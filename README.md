@@ -4,7 +4,7 @@
 A Spring Boot-based RESTful API backend for a gym mobile app.
 
 ## Features
-* **Secured Endpoints:** All API endpoints are protected with Spring Security combined with JSON Web Tokens (JWT) for robust authentication and authorization.
+* **Secured Endpoints:** All API endpoints are protected with Spring Security combined with JSON Web Tokens (JWT) for authentication and authorization.
 * **Flexible Authentication:** Supports both traditional password-based authentication and GitHub login for seamless user access.
 * **Exercise Management:** Enables the creation of exercise entities with the ability to attach demonstration video URLs, ensuring clear guidance.
 * **Workout Plan Creation:** Allows users to create personalized workout plans tailored to their fitness goals.
