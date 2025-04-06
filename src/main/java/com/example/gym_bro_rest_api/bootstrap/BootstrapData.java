@@ -145,9 +145,6 @@ public class BootstrapData implements CommandLineRunner {
 
                     workout.setSets(sets);
                     workoutRepository.save(workout);
-
-                    System.out.println(workoutRepository.count());
-                    System.out.println(exerciseSetRepository.count());
                 }
             }
         }
