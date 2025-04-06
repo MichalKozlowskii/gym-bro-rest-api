@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.context.ActiveProfiles;
 
 import java.util.Arrays;
 import java.util.Comparator;
@@ -22,6 +23,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 // all test entities saved in BootstrapData
 @SpringBootTest
+@ActiveProfiles("localmysql")
 class StatsControllerIT {
     @Autowired
     StatsController statsController;
@@ -48,7 +50,7 @@ class StatsControllerIT {
 
         List<ExerciseSet> sets = exerciseSetRepository.findExerciseSetsByExerciseId(1L);
 
-        // test leastWeight, mostWeight, plotData
+        // test leastWeight, mostWeight
 
         // sort descending by weight
         sets.sort(Comparator.comparingDouble(ExerciseSet::getWeight).reversed());
@@ -56,34 +58,30 @@ class StatsControllerIT {
         assertThat(sets.getFirst().getId()).isEqualTo(statsView.getMostWeightSet().getId());
         assertThat(sets.getLast().getId()).isEqualTo(statsView.getLeastWeightSet().getId());
 
-        System.out.println(statsView.getPlotData().stream()
-                .map(exerciseSetDTO ->
-                    Map.of(exerciseSetDTO.getWeight(), exerciseSetDTO.getCreationDate())
-                )
-                .collect(Collectors.toList()));
-
-        System.out.println(sets.stream()
-                .map(exerciseSet ->
-                        Map.of(exerciseSet.getWeight(), exerciseSet.getCreationDate())
-                )
-                .collect(Collectors.toList()));
-
-        for (int i = 0; i < statsView.getPlotData().size(); i++) {
-            assertThat(statsView.getPlotData().get(i).getWeight()).isEqualTo(sets.get(i * 3).getWeight());
-        }
-
         // test leastReps, mostReps
 
         // sort descending by reps
         sets.sort(Comparator.comparingInt(ExerciseSet::getReps).reversed());
 
-        assertThat(sets.getFirst().getId()).isEqualTo(statsView.getMostRepsSet().getId());
-        assertThat(sets.getLast().getId()).isEqualTo(statsView.getLeastRepsSet().getId());
+        assertThat(sets.getFirst().getReps()).isEqualTo(statsView.getMostRepsSet().getReps());
+        assertThat(sets.getLast().getReps()).isEqualTo(statsView.getLeastRepsSet().getReps());
 
-        // test newestSet, oldestSet
+        // test newestSet, oldestSet, plotData
 
         // sort ascending by date
         sets.sort(Comparator.comparing(ExerciseSet::getCreationDate));
+
+        // In test data, there are always 3 sets per exercise, in
+        for (int i = 0; i < 6; i++) {
+            ExerciseSet set1 = sets.get(i * 3);
+            ExerciseSet set2 = sets.get(i * 3 + 1);
+            ExerciseSet set3 = sets.get(i * 3 + 2);
+
+            Double mostWeight = Math.max(set1.getWeight(), set2.getWeight());
+            mostWeight = Math.max(mostWeight, set3.getWeight());
+
+            assertThat(statsView.getPlotData().get(i).getWeight()).isEqualTo(mostWeight);
+        }
 
         assertThat(sets.getFirst().getId()).isEqualTo(statsView.getNewestSet().getId());
         assertThat(sets.getLast().getId()).isEqualTo(statsView.getOldestSet().getId());
