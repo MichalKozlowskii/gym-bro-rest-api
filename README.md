@@ -18,6 +18,7 @@ A Spring Boot-based RESTful API backend for a gym mobile app.
 ## Dependencies used
 * Spring Security
 * OAuth2 client
+* JJWT for JWT
 * Spring Data JPA
 * Spring Boot Web
 * Spring Boot Validation
@@ -26,7 +27,6 @@ A Spring Boot-based RESTful API backend for a gym mobile app.
 * H2 database (runtime)
 * Project Lombok
 * Mapstruct
-* JJWT for JWT
 * Spring doc for Swagger
 
 ## Documentation
