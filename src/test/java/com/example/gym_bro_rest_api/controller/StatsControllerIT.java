@@ -1,17 +1,27 @@
 package com.example.gym_bro_rest_api.controller;
 
+import com.example.gym_bro_rest_api.controller.exceptions.NoAccessException;
+import com.example.gym_bro_rest_api.controller.exceptions.NotFoundException;
 import com.example.gym_bro_rest_api.entities.ExerciseSet;
 import com.example.gym_bro_rest_api.entities.User;
 import com.example.gym_bro_rest_api.model.StatsView;
 import com.example.gym_bro_rest_api.repositories.ExerciseSetRepository;
 import com.example.gym_bro_rest_api.repositories.UserRepository;
+import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
 
 import java.util.Arrays;
 import java.util.Comparator;
@@ -20,6 +30,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 // all test entities saved in BootstrapData
 @SpringBootTest
@@ -32,11 +43,48 @@ class StatsControllerIT {
     @Autowired
     ExerciseSetRepository exerciseSetRepository;
 
+    @Autowired
+    WebApplicationContext wac;
+
+    MockMvc mockMvc;
+
     User user;
 
     @BeforeEach
     void setup() {
+        mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
         user = userRepository.findById(1L).get();
+
+        UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
+                user, null, List.of(new SimpleGrantedAuthority("ROLE_USER")));
+        SecurityContextHolder.getContext().setAuthentication(auth);
+    }
+
+    @Test
+    void testGetExerciseStatsById_NoContent() {
+        ResponseEntity<StatsView> response = statsController.getExerciseStatsById(4L, user);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
+        assertThat(response.getBody()).isNull();
+    }
+
+    @Test
+    void testGetExerciseStatsById_NotFound() {
+        assertThrows(NotFoundException.class, () ->
+                statsController.getExerciseStatsById(11111111111111L, user));
+    }
+
+    @Test
+    @Transactional
+    @Rollback
+    void testGetExerciseStatsById_NoAccess() {
+        User anotherUser = userRepository.save(User.builder()
+                        .username("user11111")
+                        .password("password11")
+                .build());
+
+        assertThrows(NoAccessException.class, () ->
+                statsController.getExerciseStatsById(1L, anotherUser));
     }
 
     @Test
