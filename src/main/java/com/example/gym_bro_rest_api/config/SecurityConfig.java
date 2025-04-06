@@ -31,7 +31,9 @@ public class SecurityConfig {
             "/api/register",
             "/oauth2/**",
             "/h2-console/**",
-            "/api/oauth-success"
+            "/api/oauth-success",
+            "/swagger-ui/**",
+            "/v3/api-docs/**"
     );
 
     @Bean
