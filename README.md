@@ -27,7 +27,7 @@ A Spring Boot-based RESTful API backend for a gym mobile app.
 * H2 database (runtime)
 * Project Lombok
 * Mapstruct
-* Spring doc for Swagger
+* Spring doc
 
 ## Documentation
 soon
