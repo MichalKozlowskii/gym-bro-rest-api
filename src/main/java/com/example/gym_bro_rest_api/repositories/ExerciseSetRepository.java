@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ExerciseSetRepository extends JpaRepository<ExerciseSet, Long> {
+    List<ExerciseSet> findExerciseSetsByExerciseId(Long exerciseId);
     Optional<ExerciseSet> findTopByExerciseIdOrderByRepsDesc(Long exerciseId);
     Optional<ExerciseSet> findTopByExerciseIdOrderByRepsAsc(Long exerciseId);
     Optional<ExerciseSet> findTopByExerciseIdOrderByWeightDesc(Long exerciseId);
@@ -22,5 +23,5 @@ public interface ExerciseSetRepository extends JpaRepository<ExerciseSet, Long> 
     GROUP BY s.creationDate
     ORDER BY s.creationDate ASC
     """)
-    List<ExerciseSet> findBestSetPerDay(@Param("exerciseId") Long exerciseId);
+    List<ExerciseSet> findBestSetPerDayByExerciseId(@Param("exerciseId") Long exerciseId);
 }

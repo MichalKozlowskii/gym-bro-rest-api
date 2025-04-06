@@ -70,7 +70,7 @@ public class StatsServiceImpl implements StatsService {
                 exerciseSetRepository.findTopByExerciseIdOrderByCreationDateAsc(exerciseId)
                         .orElse(null));
 
-        List<ExerciseSetDTO> plotData = exerciseSetRepository.findBestSetPerDay(exerciseId)
+        List<ExerciseSetDTO> plotData = exerciseSetRepository.findBestSetPerDayByExerciseId(exerciseId)
                 .stream()
                 .map(exerciseSetMapper::exerciseSetToExerciseSetDTO)
                 .toList();
