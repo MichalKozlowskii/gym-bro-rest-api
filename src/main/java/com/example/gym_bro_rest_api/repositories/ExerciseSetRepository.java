@@ -16,12 +16,16 @@ public interface ExerciseSetRepository extends JpaRepository<ExerciseSet, Long> 
     Optional<ExerciseSet> findTopByExerciseIdOrderByWeightAsc(Long exerciseId);
     Optional<ExerciseSet> findTopByExerciseIdOrderByCreationDateDesc(Long exerciseId);
     Optional<ExerciseSet> findTopByExerciseIdOrderByCreationDateAsc(Long exerciseId);
-    @Query("""
-    SELECT s FROM ExerciseSet s
-    WHERE s.exercise.id = :exerciseId
-    AND s.weight = (SELECT MAX(s2.weight) FROM ExerciseSet s2 WHERE s2.exercise.id = :exerciseId AND s2.creationDate = s.creationDate)
-    GROUP BY s.creationDate
-    ORDER BY s.creationDate ASC
-    """)
+    @Query(value = """
+        SELECT s.* FROM sets s
+        WHERE s.exercise_id = :exerciseId
+        AND s.weight = (
+            SELECT MAX(s2.weight)
+            FROM sets s2
+            WHERE s2.exercise_id = :exerciseId
+            AND DATE(s2.creation_date) = DATE(s.creation_date)
+        )
+        ORDER BY s.creation_date
+    """, nativeQuery = true)
     List<ExerciseSet> findBestSetPerDayByExerciseId(@Param("exerciseId") Long exerciseId);
 }
