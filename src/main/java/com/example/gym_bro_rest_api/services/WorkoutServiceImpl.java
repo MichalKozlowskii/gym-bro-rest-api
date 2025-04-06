@@ -81,9 +81,11 @@ public class WorkoutServiceImpl implements WorkoutService {
         }
 
         List<ExerciseSet> sets = workout.getSets();
-        if (!sets.removeIf(set -> set.equals(exerciseSet))) {
+        if (!sets.contains(exerciseSet)) {
             return false;
         }
+
+        sets.remove(exerciseSet);
 
         workout.setSets(sets);
         Workout updatedWorkout = workoutRepository.save(workout);
