@@ -10,6 +10,10 @@ A Spring Boot-based RESTful API backend for a gym mobile app.
 * **Workout Plan Creation:** Allows users to create personalized workout plans tailored to their fitness goals.
 * **Workout Functionality:** Provides comprehensive workout functionalities integrated within the API.
 * **Stats Tracking:** Incorporates detailed tracking of exercise statistics to help users monitor progress and improve their performance.
+* **Comprehensive Testing:** The application is tested using a layered approach:
+  * **Unit Tests** for business logic validation.
+  * **Integration Tests** to verify the correct interaction between components.
+  * **Web Layer Tests** to ensure API endpoints behave as expected.
 
 ## Dependencies used
 * Spring Security
