@@ -598,7 +598,8 @@ class WorkoutControllerIT {
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
 
-        assertThat(exerciseRepository.findById(exerciseSet.getId())).isNotEmpty();
+        assertThat(exerciseSetRepository.findById(exerciseSet.getId())).isNotEmpty();
+        System.out.println(exerciseRepository.findById(exerciseSet.getId()));
     }
 
     @Test
