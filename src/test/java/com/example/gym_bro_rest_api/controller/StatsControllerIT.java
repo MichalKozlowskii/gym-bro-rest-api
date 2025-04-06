@@ -2,9 +2,11 @@ package com.example.gym_bro_rest_api.controller;
 
 import com.example.gym_bro_rest_api.controller.exceptions.NoAccessException;
 import com.example.gym_bro_rest_api.controller.exceptions.NotFoundException;
+import com.example.gym_bro_rest_api.entities.Exercise;
 import com.example.gym_bro_rest_api.entities.ExerciseSet;
 import com.example.gym_bro_rest_api.entities.User;
 import com.example.gym_bro_rest_api.model.StatsView;
+import com.example.gym_bro_rest_api.repositories.ExerciseRepository;
 import com.example.gym_bro_rest_api.repositories.ExerciseSetRepository;
 import com.example.gym_bro_rest_api.repositories.UserRepository;
 import jakarta.transaction.Transactional;
@@ -13,6 +15,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -31,6 +34,9 @@ import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 // all test entities saved in BootstrapData
 @SpringBootTest
@@ -42,6 +48,8 @@ class StatsControllerIT {
     UserRepository userRepository;
     @Autowired
     ExerciseSetRepository exerciseSetRepository;
+    @Autowired
+    ExerciseRepository exerciseRepository;
 
     @Autowired
     WebApplicationContext wac;
@@ -49,11 +57,15 @@ class StatsControllerIT {
     MockMvc mockMvc;
 
     User user;
+    Exercise exerciseWithSets;
+    Exercise exerciseNoSets;
 
     @BeforeEach
     void setup() {
         mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
         user = userRepository.findById(1L).get();
+        exerciseWithSets = exerciseRepository.findById(1L).get();
+        exerciseNoSets = exerciseRepository.findById(4L).get();
 
         UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
                 user, null, List.of(new SimpleGrantedAuthority("ROLE_USER")));
@@ -61,8 +73,31 @@ class StatsControllerIT {
     }
 
     @Test
+    void testGetExerciseStatsById_Web_NoContent() throws Exception {
+        mockMvc.perform(get("/api/stats/{id}", exerciseNoSets.getId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
+    void testGetExerciseStatsById_Web_Success() throws Exception {
+        mockMvc.perform(get("/api/stats/{id}", exerciseWithSets.getId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.mostWeightSet").isNotEmpty())
+                .andExpect(jsonPath("$.leastWeightSet").isNotEmpty())
+                .andExpect(jsonPath("$.mostRepsSet").isNotEmpty())
+                .andExpect(jsonPath("$.leastRepsSet").isNotEmpty())
+                .andExpect(jsonPath("$.newestSet").isNotEmpty())
+                .andExpect(jsonPath("$.oldestSet").isNotEmpty())
+                .andExpect(jsonPath("$.plotData").isNotEmpty());
+    }
+
+    @Test
     void testGetExerciseStatsById_NoContent() {
-        ResponseEntity<StatsView> response = statsController.getExerciseStatsById(4L, user);
+        ResponseEntity<StatsView> response = statsController.getExerciseStatsById(exerciseNoSets.getId(), user);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
         assertThat(response.getBody()).isNull();
@@ -84,19 +119,19 @@ class StatsControllerIT {
                 .build());
 
         assertThrows(NoAccessException.class, () ->
-                statsController.getExerciseStatsById(1L, anotherUser));
+                statsController.getExerciseStatsById(exerciseWithSets.getId(), anotherUser));
     }
 
     @Test
     void testGetExerciseStatsById_Success() {
-        ResponseEntity<StatsView> response = statsController.getExerciseStatsById(1L, user);
+        ResponseEntity<StatsView> response = statsController.getExerciseStatsById(exerciseWithSets.getId(), user);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).isNotNull();
 
         StatsView statsView = response.getBody();
 
-        List<ExerciseSet> sets = exerciseSetRepository.findExerciseSetsByExerciseId(1L);
+        List<ExerciseSet> sets = exerciseSetRepository.findExerciseSetsByExerciseId(exerciseWithSets.getId());
 
         // test leastWeight, mostWeight
 
