@@ -8,9 +8,9 @@ import java.util.Optional;
 
 public interface WorkoutPlanService {
     WorkoutPlanDTO saveNewWorkoutPlan(WorkoutPlanDTO workoutPlanDTO, User user);
-    Optional<WorkoutPlanDTO> getWorkoutPlanById(Long id);
+    WorkoutPlanDTO getWorkoutPlanById(Long id, User user);
 
-    Optional<WorkoutPlanDTO> updateWorkoutPlanById(Long id, WorkoutPlanDTO workoutPlanDTO, User user);
+    void updateWorkoutPlanById(Long id, WorkoutPlanDTO workoutPlanDTO, User user);
 
     void deleteWorkoutPlanById(Long id, User user);
 

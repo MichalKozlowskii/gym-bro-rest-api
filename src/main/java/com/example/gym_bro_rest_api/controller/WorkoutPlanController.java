@@ -35,20 +35,14 @@ public class WorkoutPlanController {
 
     @GetMapping("/{workoutPlanId}")
     WorkoutPlanDTO getWorkoutPlanById(@PathVariable("workoutPlanId") Long id, @AuthenticationPrincipal User user) {
-        WorkoutPlanDTO workoutPlanDTO = workoutPlanService.getWorkoutPlanById(id).orElseThrow(NotFoundException::new);
-
-        if (!Objects.equals(user.getId(), workoutPlanDTO.getUserId())) {
-            throw new NoAccessException();
-        }
-
-        return workoutPlanDTO ;
+        return workoutPlanService.getWorkoutPlanById(id, user);
     }
 
     @PutMapping("/{workoutPlanId}")
     ResponseEntity<Map<String, String>> updateWorkoutPlanById(@PathVariable("workoutPlanId") Long id,
                                                               @Valid @RequestBody WorkoutPlanDTO workoutPlanDTO,
                                                               @AuthenticationPrincipal User user) {
-        workoutPlanService.updateWorkoutPlanById(id, workoutPlanDTO, user).orElseThrow(NotFoundException::new);
+        workoutPlanService.updateWorkoutPlanById(id, workoutPlanDTO, user);
 
         return ResponseEntity.status(HttpStatus.OK)
                 .body(Map.of("success", "Workout plan updated."));

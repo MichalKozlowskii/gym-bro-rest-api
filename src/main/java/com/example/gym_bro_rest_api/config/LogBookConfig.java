@@ -12,7 +12,7 @@ import java.util.Set;
 public class LogBookConfig {
     @Bean
     public Logbook logbook() {
-        BodyFilter jwtFilter = JsonBodyFilters.replaceJsonStringProperty(Set.of("jwt_token"), "XXX");
+        BodyFilter jwtFilter = JsonBodyFilters.replaceJsonStringProperty(Set.of("jwt_token", "password"), "XXX");
 
         return Logbook.builder()
                 .bodyFilter(jwtFilter)
