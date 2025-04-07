@@ -28,6 +28,9 @@ A Spring Boot-based RESTful API backend for a gym mobile app.
 * Project Lombok
 * Mapstruct
 * Spring doc
+* Actuator
+* Zalando Log Book
+* Spring Boot Cache
 
 ## Documentation
 soon
