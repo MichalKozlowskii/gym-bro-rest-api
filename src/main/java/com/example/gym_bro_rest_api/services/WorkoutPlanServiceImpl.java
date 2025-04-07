@@ -12,6 +12,8 @@ import com.example.gym_bro_rest_api.repositories.ExerciseRepository;
 import com.example.gym_bro_rest_api.repositories.WorkoutPlanrepository;
 import com.example.gym_bro_rest_api.services.utils.PaginationUtils;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -27,6 +29,21 @@ public class WorkoutPlanServiceImpl implements WorkoutPlanService {
     private final WorkoutPlanMapper workoutPlanMapper;
     private final WorkoutPlanrepository workoutPlanrepository;
     private final ExerciseRepository exerciseRepository;
+    private final CacheManager cacheManager;
+
+    private void evictWorkoutPlanCache(Long workoutPlanId, Long userId) {
+        Cache workoutPlanCache = cacheManager.getCache("WORKOUTPLAN_CACHE");
+
+        if (workoutPlanCache != null) {
+            workoutPlanCache.evict(workoutPlanId + "-" + userId);
+        }
+
+        Cache workoutPlanListCache = cacheManager.getCache("WORKOUTPLAN_LIST_CACHE");
+
+        if (workoutPlanListCache != null) {
+            workoutPlanListCache.evict(userId);
+        }
+    }
 
     private List<Exercise> convertExerciseDtoList(List<ExerciseDTO> list, User user) {
         return list.stream()
@@ -61,14 +78,20 @@ public class WorkoutPlanServiceImpl implements WorkoutPlanService {
     }
 
     @Override
-    public Optional<WorkoutPlanDTO> getWorkoutPlanById(Long id) {
-        return workoutPlanrepository.findById(id)
-                .map(workoutPlanMapper::workoutPlanToWorkoutPlanDto);
+    public WorkoutPlanDTO getWorkoutPlanById(Long id, User user) {
+        WorkoutPlan workoutPlan = workoutPlanrepository.findById(id).orElseThrow(NotFoundException::new);
+
+        if (!Objects.equals(workoutPlan.getUser().getId(), user.getId())) {
+            throw new NoAccessException();
+        }
+
+        return workoutPlanMapper.workoutPlanToWorkoutPlanDto(workoutPlan);
     }
 
     @Override
-    public Optional<WorkoutPlanDTO> updateWorkoutPlanById(Long id, WorkoutPlanDTO workoutPlanDTO, User user) {
-        return workoutPlanrepository.findById(id).map(workoutPlan -> {
+    public void updateWorkoutPlanById(Long id, WorkoutPlanDTO workoutPlanDTO, User user) {
+            WorkoutPlan workoutPlan = workoutPlanrepository.findById(id).orElseThrow(NotFoundException::new);
+
             if (!Objects.equals(workoutPlan.getUser().getId(), user.getId())) {
                 throw new NoAccessException();
             }
@@ -82,19 +105,14 @@ public class WorkoutPlanServiceImpl implements WorkoutPlanService {
             workoutPlan.setName(workoutPlanDTO.getName());
             workoutPlan.setExercises(exercises);
             workoutPlan.setSetsReps(workoutPlanDTO.getSetsReps());
-            WorkoutPlan updated = workoutPlanrepository.save(workoutPlan);
-
-            return workoutPlanMapper.workoutPlanToWorkoutPlanDto(updated);
-        });
+            workoutPlanrepository.save(workoutPlan);
     }
 
     @Override
     public void deleteWorkoutPlanById(Long id, User user) {
-        if (!workoutPlanrepository.existsById(id)) {
-            throw new NotFoundException();
-        }
+        WorkoutPlan workoutPlan = workoutPlanrepository.findById(id).orElseThrow(NotFoundException::new);
 
-        if (!workoutPlanrepository.existsByIdAndUserId(id, user.getId())) {
+        if (!Objects.equals(workoutPlan.getUser().getId(), user.getId())) {
             throw new NoAccessException();
         }
 
