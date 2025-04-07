@@ -9,7 +9,7 @@ import java.util.Optional;
 public interface ExerciseService {
     ExerciseDTO saveNewExercise(ExerciseDTO exerciseDTO, User user);
     ExerciseDTO getExerciseById(Long id, User user);
-    ExerciseDTO updateExerciseById(Long id, ExerciseDTO exerciseDTO, User user);
+    void updateExerciseById(Long id, ExerciseDTO exerciseDTO, User user);
     void deleteExerciseById(Long id, User user);
     Page<ExerciseDTO> listExercisesOfUser(User user, Integer pageNumber, Integer pageSize);
 }

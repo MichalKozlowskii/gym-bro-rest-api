@@ -66,7 +66,7 @@ public class ExerciseServiceImpl implements ExerciseService {
     }
 
     @Override
-    public ExerciseDTO updateExerciseById(Long id, ExerciseDTO exerciseDTO, User user) {
+    public void updateExerciseById(Long id, ExerciseDTO exerciseDTO, User user) {
         Exercise exercise = exerciseRepository.findById(id).orElseThrow(NotFoundException::new);
 
         if (!Objects.equals(exercise.getUser().getId(), user.getId())) {
@@ -77,10 +77,8 @@ public class ExerciseServiceImpl implements ExerciseService {
 
         exercise.setName(exerciseDTO.getName());
         exercise.setDemonstrationUrl(exerciseDTO.getDemonstrationUrl());
-
-        Exercise updated = exerciseRepository.save(exercise);
-
-        return exerciseMapper.exerciseToExerciseDto(updated);
+        
+        exerciseRepository.save(exercise);
     }
 
     @Override
