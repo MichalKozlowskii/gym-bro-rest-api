@@ -9,6 +9,9 @@ import com.example.gym_bro_rest_api.model.ExerciseDTO;
 import com.example.gym_bro_rest_api.repositories.ExerciseRepository;
 import com.example.gym_bro_rest_api.services.utils.PaginationUtils;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -22,11 +25,24 @@ import java.util.Optional;
 public class ExerciseServiceImpl implements ExerciseService {
     private final ExerciseRepository exerciseRepository;
     private final ExerciseMapper exerciseMapper;
-    
-    private final static int DEFAULT_PAGE = 0;
-    private final static int DEFAULT_PAGE_SIZE = 10;
+    private final CacheManager cacheManager;
+
+    private void evictExerciseCache(Long exerciseId, Long userId) {
+        Cache exerciseCache = cacheManager.getCache("EXERCISE_CACHE");
+
+        if (exerciseCache != null) {
+            exerciseCache.evict(exerciseId + "-" + userId);
+        }
+
+        Cache exerciseListCache = cacheManager.getCache("EXERCISE_LIST_CACHE");
+
+        if (exerciseListCache != null) {
+            exerciseListCache.evict(userId);
+        }
+    }
 
     @Override
+    @CacheEvict(cacheNames = "EXERCISE_LIST_CACHE", key = "#user.id")
     public ExerciseDTO saveNewExercise(ExerciseDTO exerciseDTO, User user) {
         Exercise exercise = Exercise.builder()
                 .name(exerciseDTO.getName())
@@ -57,6 +73,8 @@ public class ExerciseServiceImpl implements ExerciseService {
             throw new NoAccessException();
         }
 
+        evictExerciseCache(id, user.getId());
+
         exercise.setName(exerciseDTO.getName());
         exercise.setDemonstrationUrl(exerciseDTO.getDemonstrationUrl());
 
@@ -73,10 +91,13 @@ public class ExerciseServiceImpl implements ExerciseService {
             throw new NoAccessException();
         }
 
+        evictExerciseCache(id, user.getId());
+
         exerciseRepository.deleteById(id);
     }
 
     @Override
+    @Cacheable(cacheNames = "EXERCISE_LIST_CACHE", key = "#user.id")
     public Page<ExerciseDTO> listExercisesOfUser(User user, Integer pageNumber, Integer pageSize) {
         PageRequest pageRequest = PaginationUtils.buildPageRequest(pageNumber, pageSize);
         Page<Exercise> exercisePage = exerciseRepository.findExercisesByUserId(user.getId(), pageRequest);
