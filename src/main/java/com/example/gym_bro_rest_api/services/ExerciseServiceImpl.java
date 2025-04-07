@@ -9,6 +9,7 @@ import com.example.gym_bro_rest_api.model.ExerciseDTO;
 import com.example.gym_bro_rest_api.repositories.ExerciseRepository;
 import com.example.gym_bro_rest_api.services.utils.PaginationUtils;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -37,32 +38,38 @@ public class ExerciseServiceImpl implements ExerciseService {
     }
 
     @Override
-    public Optional<ExerciseDTO> getExerciseById(Long id) {
-        return exerciseRepository.findById(id)
-                .map(exerciseMapper::exerciseToExerciseDto);
+    @Cacheable(cacheNames = "EXERCISE_CACHE", key = "#id + '-' + #user.id")
+    public ExerciseDTO getExerciseById(Long id, User user) {
+        Exercise exercise = exerciseRepository.findById(id).orElseThrow(NotFoundException::new);
+
+        if (!Objects.equals(exercise.getUser().getId(), user.getId())) {
+            throw new NoAccessException();
+        }
+
+        return exerciseMapper.exerciseToExerciseDto(exercise);
     }
 
     @Override
-    public Optional<ExerciseDTO> updateExerciseById(Long id, ExerciseDTO exerciseDTO, User user) {
-        return exerciseRepository.findById(id).map(exercise -> {
-            if (!Objects.equals(exercise.getUser().getId(), user.getId())) {
-                throw new NoAccessException();
-            }
+    public ExerciseDTO updateExerciseById(Long id, ExerciseDTO exerciseDTO, User user) {
+        Exercise exercise = exerciseRepository.findById(id).orElseThrow(NotFoundException::new);
 
-            exercise.setName(exerciseDTO.getName());
-            exercise.setDemonstrationUrl(exerciseDTO.getDemonstrationUrl());
+        if (!Objects.equals(exercise.getUser().getId(), user.getId())) {
+            throw new NoAccessException();
+        }
 
-            Exercise updated = exerciseRepository.save(exercise);
+        exercise.setName(exerciseDTO.getName());
+        exercise.setDemonstrationUrl(exerciseDTO.getDemonstrationUrl());
 
-            return exerciseMapper.exerciseToExerciseDto(updated);
-        });
+        Exercise updated = exerciseRepository.save(exercise);
+
+        return exerciseMapper.exerciseToExerciseDto(updated);
     }
 
     @Override
     public void deleteExerciseById(Long id, User user) {
         Exercise exercise = exerciseRepository.findById(id).orElseThrow(NotFoundException::new);
 
-        if (!user.getId().equals(exercise.getUser().getId())) {
+        if (!Objects.equals(exercise.getUser().getId(), user.getId())) {
             throw new NoAccessException();
         }
 

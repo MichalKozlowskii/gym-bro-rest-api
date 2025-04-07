@@ -37,21 +37,14 @@ public class ExerciseController {
 
     @GetMapping("/{exerciseId}")
     ExerciseDTO getExerciseById(@PathVariable("exerciseId") Long id, @AuthenticationPrincipal User user) {
-
-        ExerciseDTO exerciseDTO = exerciseService.getExerciseById(id).orElseThrow(NotFoundException::new);
-
-        if (!Objects.equals(user.getId(), exerciseDTO.getUserId())) {
-            throw new NoAccessException();
-        }
-
-        return exerciseDTO;
+        return exerciseService.getExerciseById(id, user);
     }
 
     @PutMapping("/{exerciseId}")
     ResponseEntity<Map<String, String>> updateExerciseById(@PathVariable("exerciseId") Long id,
                                                            @Valid @RequestBody ExerciseDTO exerciseDTO,
                                                            @AuthenticationPrincipal User user) {
-        exerciseService.updateExerciseById(id, exerciseDTO, user).orElseThrow(NotFoundException::new);
+        exerciseService.updateExerciseById(id, exerciseDTO, user);
         
         return ResponseEntity.status(HttpStatus.OK)
                 .body(Map.of("success", "Exercise updated."));
