@@ -14,6 +14,8 @@ import com.example.gym_bro_rest_api.services.utils.PaginationUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -60,6 +62,7 @@ public class WorkoutPlanServiceImpl implements WorkoutPlanService {
                 .toList();
     }
     @Override
+    @CacheEvict(cacheNames = "WORKOUTPLAN_LIST_CACHE", key = "#user.id")
     public WorkoutPlanDTO saveNewWorkoutPlan(WorkoutPlanDTO workoutPlanDTO, User user) {
         List<Exercise> exercises = new ArrayList<>();
 
@@ -78,6 +81,7 @@ public class WorkoutPlanServiceImpl implements WorkoutPlanService {
     }
 
     @Override
+    @Cacheable(cacheNames = "WORKOUTPLAN_CACHE", key = "#id + '-' + #user.id")
     public WorkoutPlanDTO getWorkoutPlanById(Long id, User user) {
         WorkoutPlan workoutPlan = workoutPlanrepository.findById(id).orElseThrow(NotFoundException::new);
 
@@ -106,6 +110,8 @@ public class WorkoutPlanServiceImpl implements WorkoutPlanService {
             workoutPlan.setExercises(exercises);
             workoutPlan.setSetsReps(workoutPlanDTO.getSetsReps());
             workoutPlanrepository.save(workoutPlan);
+
+            evictWorkoutPlanCache(id, user.getId());
     }
 
     @Override
@@ -117,9 +123,11 @@ public class WorkoutPlanServiceImpl implements WorkoutPlanService {
         }
 
         workoutPlanrepository.deleteById(id);
+        evictWorkoutPlanCache(id, user.getId());
     }
 
     @Override
+    @Cacheable(cacheNames = "WORKOUTPLAN_LIST_CACHE", key = "#user.id")
     public Page<WorkoutPlanDTO> listExercisesOfUser(User user, Integer pageNumber, Integer pageSize) {
         PageRequest pageRequest = PaginationUtils.buildPageRequest(pageNumber, pageSize);
         Page<WorkoutPlan> workoutPlansPage = workoutPlanrepository.findWorkoutPlansByUserId(user.getId(), pageRequest);
