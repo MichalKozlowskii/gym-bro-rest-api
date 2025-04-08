@@ -1,0 +1,27 @@
+services:
+  mysql:
+    container_name: mysql
+    image: mysql:8
+    platform: linux/arm64
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+    expose:
+      - "3306"
+
+  gym_bro_rest:
+    container_name: gym_bro_rest
+    image: gym-bro-rest-api:0.0.1-SNAPSHOT
+    platform: linux/arm64
+    environment:
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE}
+      JWT_SECRET: ${JWT_SECRET}
+      GITHUB_CLIENT_ID: ${GITHUB_CLIENT_ID}
+      GITHUB_CLIENT_SECRET: ${GITHUB_CLIENT_SECRET}
+      DB_URL: ${DB_URL}
+    expose:
+      - 8080
+    depends_on:
+      - mysql
