@@ -32,5 +32,5 @@ A Spring Boot-based RESTful API backend for a gym mobile app.
 * Zalando Log Book
 * Spring Boot Cache
 
-## Documentation
-soon
+## Live Demo
+[Check it out](https://gym-bro-rest-api.onrender.com/swagger-ui/index.html)
