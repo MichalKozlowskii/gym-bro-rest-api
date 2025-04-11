@@ -1,4 +1,4 @@
-FROM eclipse-temurin:21.0.1-jdk-alpine
+FROM eclipse-temurin:21.0.1_12-jdk
 
 # Create and change to the app directory.
 WORKDIR /app
