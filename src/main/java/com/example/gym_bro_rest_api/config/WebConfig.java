@@ -8,23 +8,10 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/**")  // Applies to all your REST endpoints
-                .allowedOrigins("*")  // Change this to specific origin(s) in production
+        registry.addMapping("/**")
+                .allowedOrigins("*")
                 .allowedMethods("*")
                 .allowedHeaders("*");
-
-        // Optional: More precise control for Springdoc endpoints
-        registry.addMapping("/v3/api-docs/**")
-                .allowedOrigins("*")
-                .allowedMethods("*");
-
-        registry.addMapping("/swagger-ui/**")
-                .allowedOrigins("*")
-                .allowedMethods("*");
-
-        registry.addMapping("/swagger-ui.html")
-                .allowedOrigins("*")
-                .allowedMethods("*");
     }
 }
 
