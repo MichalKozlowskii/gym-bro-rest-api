@@ -1,14 +1,14 @@
 # Use an official Java runtime as a parent image
-FROM amazoncorretto:21.0.4-alpine3.18
+FROM amazoncorretto:21.0.0
 
-# Set the working directory in the container
+# Create and change to the app directory.
 WORKDIR /app
 
-# Copy the JAR file into the container
-COPY target/containerize-java-spring-0.0.1-SNAPSHOT.jar app.jar
+# Copy files to the container image
+COPY . ./
 
-# Expose the port that the application will run on
-EXPOSE 8080
+# Build the app.
+RUN ./mvnw -DoutputFile=target/mvn-dependency-list.log -B -DskipTests clean dependency:list install
 
-# Run the JAR file
-ENTRYPOINT ["java", "-jar", "app.jar"]
+# Run the app by dynamically finding the JAR file in the target directory
+CMD ["sh", "-c", "java -jar target/*.jar"]
