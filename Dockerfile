@@ -1,4 +1,4 @@
-FROM eclipse-temurin:21.0.1_12-jdk
+FROM eclipse-temurin:21-jdk
 
 # Create and change to the app directory.
 WORKDIR /app
@@ -11,6 +11,8 @@ RUN chmod +x ./mvnw
 
 # Build the app.
 RUN ./mvnw -DoutputFile=target/mvn-dependency-list.log -B -DskipTests clean dependency:list install
+
+EXPOSE 8080
 
 # Run the app by dynamically finding the JAR file in the target directory
 CMD ["java", "-jar", "target/gym-bro-rest-api-0.0.1-SNAPSHOT.jar"]
