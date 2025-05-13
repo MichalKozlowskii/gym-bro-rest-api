@@ -33,4 +33,4 @@ A Spring Boot-based RESTful API backend for a gym mobile app.
 * Spring Boot Cache
 
 ## Live Demo
-coming soon
+[Swagger](https://gym-bro-rest-api.politeground-32cb1c67.polandcentral.azurecontainerapps.io/swagger-ui/index.html)
