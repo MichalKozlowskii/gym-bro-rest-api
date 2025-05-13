@@ -11,7 +11,6 @@ import javax.crypto.SecretKey;
 import java.util.Date;
 import java.util.function.Function;
 
-@Profile("!test")
 @Service
 public class JwtService {
 

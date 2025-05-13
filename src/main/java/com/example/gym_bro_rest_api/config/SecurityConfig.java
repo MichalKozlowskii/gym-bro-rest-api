@@ -22,7 +22,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 import java.util.List;
 
-@Profile("!test")
 @Configuration
 @RequiredArgsConstructor
 public class SecurityConfig {
