@@ -28,7 +28,7 @@ jobs:
         uses: stCarolas/setup-maven@v5
         with:
           maven-version: '3.9.6'
-          
+
       - name: Set secrets as environment variables
         run: |
           echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> $GITHUB_ENV
@@ -40,11 +40,10 @@ jobs:
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
-
       - name: Log in to ACR
         uses: docker/login-action@v3
         with:
-          registry: ${{ env.AZURE.CONTAINER.REGISTRY  }}.azurecr.io
+          registry: ${{ env.AZURE_CONTAINER_REGISTRY  }}.azurecr.io
           username: ${{ secrets.AZURE_REGISTRY_USERNAME }}
           password: ${{ secrets.AZURE_REGISTRY_PASSWORD }}
 
