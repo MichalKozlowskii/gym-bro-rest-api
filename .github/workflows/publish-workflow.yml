@@ -50,9 +50,11 @@ jobs:
       - name: Build and push image to ACR
         uses: docker/build-push-action@v6
         with:
+          context: .
+          file: Dockerfile
           push: true
           tags: ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ env.CONTAINER_APP_NAME }}:${{ github.sha }}
-          file: Dockerfile
+
 
       - name: Log in to Azure with code, because I have no access to app registry :(
         uses: azure/login@v2
