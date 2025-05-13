@@ -32,8 +32,6 @@ public class SecurityConfig {
             "/api/login",
             "/api/register",
             "/oauth2/**",
-            "/h2-console/**",
-            "/api/oauth-success",
             "/swagger-ui/**",
             "/v3/api-docs/**",
             "/swagger-ui.html"
