@@ -2,8 +2,8 @@ name: Deploy to Azure Container Apps
 
 on:
   workflow_dispatch:
-    push:
-      branches: [prod]
+  push:
+    branches: [prod]
 
 env:
   AZURE_CONTAINER_REGISTRY: gymbroregistry
