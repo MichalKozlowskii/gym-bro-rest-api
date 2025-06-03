@@ -127,7 +127,7 @@ public class WorkoutPlanServiceImpl implements WorkoutPlanService {
     }
 
     @Override
-    @Cacheable(cacheNames = "WORKOUTPLAN_LIST_CACHE", key = "#user.id + '-' + #pageNumber + '-' + #pageSize")
+    @Cacheable(cacheNames = "WORKOUTPLAN_LIST_CACHE", key = "#user.id")
     public Page<WorkoutPlanDTO> listExercisesOfUser(User user, Integer pageNumber, Integer pageSize) {
         PageRequest pageRequest = PaginationUtils.buildPageRequest(pageNumber, pageSize);
         Page<WorkoutPlan> workoutPlansPage = workoutPlanrepository.findWorkoutPlansByUserId(user.getId(), pageRequest);

@@ -95,11 +95,13 @@ public class ExerciseServiceImpl implements ExerciseService {
     }
 
     @Override
-    @Cacheable(cacheNames = "EXERCISE_LIST_CACHE", key = "#user.id + '-' + #pageNumber + '-' + #pageSize")
+    @Cacheable(cacheNames = "EXERCISE_LIST_CACHE", key = "#user.id")
     public Page<ExerciseDTO> listExercisesOfUser(User user, Integer pageNumber, Integer pageSize) {
         PageRequest pageRequest = PaginationUtils.buildPageRequest(pageNumber, pageSize);
         Page<Exercise> exercisePage = exerciseRepository.findExercisesByUserId(user.getId(), pageRequest);
 
         return exercisePage.map(exerciseMapper::exerciseToExerciseDto);
     }
+
+    // TODO: fix cache
 }
