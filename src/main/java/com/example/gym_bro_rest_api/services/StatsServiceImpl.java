@@ -63,11 +63,11 @@ public class StatsServiceImpl implements StatsService {
                         .orElse(null));
 
         ExerciseSetDTO newestSet =  exerciseSetMapper.exerciseSetToExerciseSetDTO(
-                exerciseSetRepository.findTopByExerciseIdOrderByCreationDateAsc(exerciseId)
+                exerciseSetRepository.findTopByExerciseIdOrderByCreationDateDesc(exerciseId)
                         .orElse(null));
 
         ExerciseSetDTO oldestSet = exerciseSetMapper.exerciseSetToExerciseSetDTO(
-                exerciseSetRepository.findTopByExerciseIdOrderByCreationDateDesc(exerciseId)
+                exerciseSetRepository.findTopByExerciseIdOrderByCreationDateAsc(exerciseId)
                         .orElse(null));
 
         List<ExerciseSetDTO> plotData = exerciseSetRepository.findBestSetPerDayByExerciseId(exerciseId)
