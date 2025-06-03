@@ -65,33 +65,28 @@ public class WorkoutServiceImpl implements WorkoutService {
     @Override
     public Boolean deleteSet(Long workoutId, Long setId, User user) {
         Workout workout = workoutRepository.findById(workoutId).orElseThrow(NotFoundException::new);
-
         if (!workout.getUser().getId().equals(user.getId())) {
             throw new NoAccessException();
         }
 
         ExerciseSet exerciseSet = exerciseSetService.getExerciseSetById(setId).orElseThrow(NotFoundException::new);
-
         if (!exerciseSet.getUser().getId().equals(user.getId())) {
             throw new NoAccessException();
         }
 
-        if (!exerciseSet.getWorkout().equals(workout)) {
+        if (!exerciseSet.getWorkout().getId().equals(workoutId)) {
             return false;
         }
 
-        List<ExerciseSet> sets = workout.getSets();
-        if (!sets.contains(exerciseSet)) {
+        boolean removed = workout.getSets().removeIf(set -> set.getId().equals(setId));
+        if (!removed) {
             return false;
         }
 
-        sets.remove(exerciseSet);
-
-        workout.setSets(sets);
-        Workout updatedWorkout = workoutRepository.save(workout);
-
-        return exerciseSetService.deleteSetById(setId);
+        workoutRepository.save(workout);
+        return true;
     }
+
 
     @Override
     public void deleteWorkoutById(Long workoutId, User user) {
