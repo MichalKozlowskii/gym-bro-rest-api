@@ -8,6 +8,7 @@ import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -27,10 +28,10 @@ public class WorkoutPlan {
     private String name;
 
     @ManyToMany
-    private List<Exercise> exercises;
+    private List<Exercise> exercises = new ArrayList<>();
 
     @ElementCollection
-    private List<SetsReps> setsReps;
+    private List<SetsReps> setsReps = new ArrayList<>();
 
     @ManyToOne
     @NotNull

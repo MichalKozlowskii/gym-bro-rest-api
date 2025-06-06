@@ -166,7 +166,7 @@ class StatsControllerIT {
             assertThat(statsView.getPlotData().get(i).getWeight()).isEqualTo(mostWeight);
         }
 
-        assertThat(sets.getFirst().getId()).isEqualTo(statsView.getNewestSet().getId());
-        assertThat(sets.getLast().getId()).isEqualTo(statsView.getOldestSet().getId());
+        assertThat(sets.getFirst().getId()).isEqualTo(statsView.getOldestSet().getId());
+        assertThat(sets.getLast().getId()).isEqualTo(statsView.getNewestSet().getId());
     }
 }

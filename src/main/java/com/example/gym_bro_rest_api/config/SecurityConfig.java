@@ -31,6 +31,8 @@ public class SecurityConfig {
     public static final List<String> EXCLUDED_PATHS = List.of(
             "/api/login",
             "/api/register",
+            "/login/oauth2/**",
+            "/api/oauth-success",
             "/oauth2/**",
             "/h2-console/**",
             "/api/oauth-success",
@@ -66,7 +68,6 @@ public class SecurityConfig {
                 )
                 .oauth2Login(oauth2 -> oauth2
                         .successHandler(oAuth2SuccessHandler)
-                        .authorizationEndpoint(endpoint -> endpoint.baseUri("/api/login/github"))
                 )
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
                 .headers().frameOptions().disable();
