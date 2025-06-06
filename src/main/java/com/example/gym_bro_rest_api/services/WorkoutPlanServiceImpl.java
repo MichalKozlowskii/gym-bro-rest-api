@@ -10,62 +10,53 @@ import com.example.gym_bro_rest_api.model.ExerciseDTO;
 import com.example.gym_bro_rest_api.model.WorkoutPlanDTO;
 import com.example.gym_bro_rest_api.repositories.ExerciseRepository;
 import com.example.gym_bro_rest_api.repositories.WorkoutPlanrepository;
+import com.example.gym_bro_rest_api.services.utils.CacheUtils;
 import com.example.gym_bro_rest_api.services.utils.PaginationUtils;
 import lombok.RequiredArgsConstructor;
-import org.springframework.cache.Cache;
-import org.springframework.cache.CacheManager;
-import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
 public class WorkoutPlanServiceImpl implements WorkoutPlanService {
+    private static final String WORKOUTPLAN_CACHE = "WORKOUTPLAN_CACHE";
+    private static final String WORKOUTPLAN_LIST_CACHE = "WORKOUTPLAN_LIST_CACHE";
+
     private final WorkoutPlanMapper workoutPlanMapper;
     private final WorkoutPlanrepository workoutPlanrepository;
     private final ExerciseRepository exerciseRepository;
-    private final CacheManager cacheManager;
-
-    private void evictWorkoutPlanCache(Long workoutPlanId, Long userId) {
-        Cache workoutPlanCache = cacheManager.getCache("WORKOUTPLAN_CACHE");
-
-        if (workoutPlanCache != null) {
-            workoutPlanCache.evict(workoutPlanId + "-" + userId);
-        }
-
-        Cache workoutPlanListCache = cacheManager.getCache("WORKOUTPLAN_LIST_CACHE");
-
-        if (workoutPlanListCache != null) {
-            workoutPlanListCache.evict(userId);
-        }
-    }
+    private final CacheUtils cacheUtils;
 
     private List<Exercise> convertExerciseDtoList(List<ExerciseDTO> list, User user) {
         return list.stream()
                 .map(exerciseDTO -> {
                     Exercise exercise = exerciseRepository.findById(exerciseDTO.getId())
                             .orElseThrow(NotFoundException::new);
-
-                    if (!exercise.getUser().getId().equals(user.getId())) {
+                    if (!Objects.equals(exercise.getUser().getId(), user.getId())) {
                         throw new NoAccessException();
                     }
-
                     return exercise;
                 })
                 .toList();
     }
-    @Override
-    @CacheEvict(cacheNames = "WORKOUTPLAN_LIST_CACHE", key = "#user.id")
-    public WorkoutPlanDTO saveNewWorkoutPlan(WorkoutPlanDTO workoutPlanDTO, User user) {
-        List<Exercise> exercises = new ArrayList<>();
 
+    private void evictWorkoutPlanCache(Long id, Long userId) {
+        String idKey = id + "-" + userId;
+        cacheUtils.evictSingle(WORKOUTPLAN_CACHE, idKey);
+        cacheUtils.evict(WORKOUTPLAN_LIST_CACHE, userId);
+    }
+
+    private void evictWorkoutPlanPages(Long userId) {
+        cacheUtils.evict(WORKOUTPLAN_LIST_CACHE, userId);
+    }
+
+    @Override
+    public WorkoutPlanDTO saveNewWorkoutPlan(WorkoutPlanDTO workoutPlanDTO, User user) {
+        List<Exercise> exercises = Collections.emptyList();
         if (workoutPlanDTO.getExercises() != null && !workoutPlanDTO.getExercises().isEmpty()) {
             exercises = convertExerciseDtoList(workoutPlanDTO.getExercises(), user);
         }
@@ -77,60 +68,62 @@ public class WorkoutPlanServiceImpl implements WorkoutPlanService {
                 .user(user)
                 .build();
 
+        evictWorkoutPlanPages(user.getId());
+
         return workoutPlanMapper.workoutPlanToWorkoutPlanDto(workoutPlanrepository.save(workoutPlan));
     }
 
     @Override
-    @Cacheable(cacheNames = "WORKOUTPLAN_CACHE", key = "#id + '-' + #user.id")
+    @Cacheable(cacheNames = WORKOUTPLAN_CACHE, key = "#id + '-' + #user.id")
     public WorkoutPlanDTO getWorkoutPlanById(Long id, User user) {
         WorkoutPlan workoutPlan = workoutPlanrepository.findById(id).orElseThrow(NotFoundException::new);
-
         if (!Objects.equals(workoutPlan.getUser().getId(), user.getId())) {
             throw new NoAccessException();
         }
-
         return workoutPlanMapper.workoutPlanToWorkoutPlanDto(workoutPlan);
     }
 
     @Override
     public void updateWorkoutPlanById(Long id, WorkoutPlanDTO workoutPlanDTO, User user) {
-            WorkoutPlan workoutPlan = workoutPlanrepository.findById(id).orElseThrow(NotFoundException::new);
+        WorkoutPlan workoutPlan = workoutPlanrepository.findById(id).orElseThrow(NotFoundException::new);
+        if (!Objects.equals(workoutPlan.getUser().getId(), user.getId())) {
+            throw new NoAccessException();
+        }
 
-            if (!Objects.equals(workoutPlan.getUser().getId(), user.getId())) {
-                throw new NoAccessException();
-            }
+        List<Exercise> exercises = Collections.emptyList();
+        if (workoutPlanDTO.getExercises() != null && !workoutPlanDTO.getExercises().isEmpty()) {
+            exercises = convertExerciseDtoList(workoutPlanDTO.getExercises(), user);
+        }
 
-            List<Exercise> exercises = new ArrayList<>();
+        workoutPlan.setName(workoutPlanDTO.getName());
+        workoutPlan.setExercises(exercises);
+        workoutPlan.setSetsReps(workoutPlanDTO.getSetsReps());
 
-            if (workoutPlanDTO.getExercises() != null && !workoutPlanDTO.getExercises().isEmpty()) {
-                exercises = new ArrayList<>(convertExerciseDtoList(workoutPlanDTO.getExercises(), user));
-            }
+        workoutPlanrepository.save(workoutPlan);
 
-            workoutPlan.setName(workoutPlanDTO.getName());
-            workoutPlan.setExercises(exercises);
-            workoutPlan.setSetsReps(workoutPlanDTO.getSetsReps());
-            workoutPlanrepository.save(workoutPlan);
-
-            evictWorkoutPlanCache(id, user.getId());
+        evictWorkoutPlanCache(id, user.getId());
     }
 
     @Override
     public void deleteWorkoutPlanById(Long id, User user) {
         WorkoutPlan workoutPlan = workoutPlanrepository.findById(id).orElseThrow(NotFoundException::new);
-
         if (!Objects.equals(workoutPlan.getUser().getId(), user.getId())) {
             throw new NoAccessException();
         }
 
         workoutPlanrepository.deleteById(id);
+
         evictWorkoutPlanCache(id, user.getId());
     }
 
     @Override
-    @Cacheable(cacheNames = "WORKOUTPLAN_LIST_CACHE", key = "#user.id")
+    @Cacheable(cacheNames = WORKOUTPLAN_LIST_CACHE, key = "#user.id + '-' + #pageNumber + '-' + #pageSize")
     public Page<WorkoutPlanDTO> listExercisesOfUser(User user, Integer pageNumber, Integer pageSize) {
         PageRequest pageRequest = PaginationUtils.buildPageRequest(pageNumber, pageSize);
         Page<WorkoutPlan> workoutPlansPage = workoutPlanrepository.findWorkoutPlansByUserId(user.getId(), pageRequest);
+
+        String key = user.getId() + "-" + pageNumber + "-" + pageSize;
+        cacheUtils.track(WORKOUTPLAN_LIST_CACHE, user.getId(), key);
 
         return workoutPlansPage.map(workoutPlanMapper::workoutPlanToWorkoutPlanDto);
     }
