@@ -90,14 +90,18 @@ public class WorkoutPlanServiceImpl implements WorkoutPlanService {
             throw new NoAccessException();
         }
 
-        List<Exercise> exercises = Collections.emptyList();
+        List<Exercise> exercises = new ArrayList<>();
         if (workoutPlanDTO.getExercises() != null && !workoutPlanDTO.getExercises().isEmpty()) {
             exercises = convertExerciseDtoList(workoutPlanDTO.getExercises(), user);
         }
 
         workoutPlan.setName(workoutPlanDTO.getName());
-        workoutPlan.setExercises(exercises);
-        workoutPlan.setSetsReps(workoutPlanDTO.getSetsReps());
+
+        workoutPlan.getExercises().clear();
+        workoutPlan.getExercises().addAll(exercises);
+
+        workoutPlan.getSetsReps().clear();
+        workoutPlan.getSetsReps().addAll(workoutPlanDTO.getSetsReps());
 
         workoutPlanrepository.save(workoutPlan);
 
