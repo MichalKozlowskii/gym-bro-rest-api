@@ -7,42 +7,37 @@ import com.example.gym_bro_rest_api.entities.User;
 import com.example.gym_bro_rest_api.mappers.ExerciseMapper;
 import com.example.gym_bro_rest_api.model.ExerciseDTO;
 import com.example.gym_bro_rest_api.repositories.ExerciseRepository;
+import com.example.gym_bro_rest_api.services.utils.CacheUtils;
 import com.example.gym_bro_rest_api.services.utils.PaginationUtils;
 import lombok.RequiredArgsConstructor;
-import org.springframework.cache.Cache;
-import org.springframework.cache.CacheManager;
-import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.Objects;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class ExerciseServiceImpl implements ExerciseService {
     private final ExerciseRepository exerciseRepository;
     private final ExerciseMapper exerciseMapper;
-    private final CacheManager cacheManager;
+    private final CacheUtils cacheUtils;
+
+    private static final String EXERCISE_CACHE = "EXERCISE_CACHE";
+    private static final String EXERCISE_LIST_CACHE = "EXERCISE_LIST_CACHE";
+
+    private void evictExercisePages(Long userId) {
+        cacheUtils.evict(EXERCISE_LIST_CACHE, userId);
+    }
 
     private void evictExerciseCache(Long exerciseId, Long userId) {
-        Cache exerciseCache = cacheManager.getCache("EXERCISE_CACHE");
-
-        if (exerciseCache != null) {
-            exerciseCache.evict(exerciseId + "-" + userId);
-        }
-
-        Cache exerciseListCache = cacheManager.getCache("EXERCISE_LIST_CACHE");
-
-        if (exerciseListCache != null) {
-            exerciseListCache.evict(userId);
-        }
+        String key = exerciseId + "-" + userId;
+        cacheUtils.evictSingle(EXERCISE_CACHE, key);
+        evictExercisePages(userId);
     }
 
     @Override
-    @CacheEvict(cacheNames = "EXERCISE_LIST_CACHE", key = "#user.id")
     public ExerciseDTO saveNewExercise(ExerciseDTO exerciseDTO, User user) {
         Exercise exercise = Exercise.builder()
                 .name(exerciseDTO.getName())
@@ -50,11 +45,13 @@ public class ExerciseServiceImpl implements ExerciseService {
                 .user(user)
                 .build();
 
+        evictExercisePages(user.getId());
+
         return exerciseMapper.exerciseToExerciseDto(exerciseRepository.save(exercise));
     }
 
     @Override
-    @Cacheable(cacheNames = "EXERCISE_CACHE", key = "#id + '-' + #user.id")
+    @Cacheable(cacheNames = EXERCISE_CACHE, key = "#id + '-' + #user.id")
     public ExerciseDTO getExerciseById(Long id, User user) {
         Exercise exercise = exerciseRepository.findById(id).orElseThrow(NotFoundException::new);
 
@@ -77,7 +74,7 @@ public class ExerciseServiceImpl implements ExerciseService {
 
         exercise.setName(exerciseDTO.getName());
         exercise.setDemonstrationUrl(exerciseDTO.getDemonstrationUrl());
-        
+
         exerciseRepository.save(exercise);
     }
 
@@ -95,13 +92,14 @@ public class ExerciseServiceImpl implements ExerciseService {
     }
 
     @Override
-    @Cacheable(cacheNames = "EXERCISE_LIST_CACHE", key = "#user.id")
+    @Cacheable(cacheNames = EXERCISE_LIST_CACHE, key = "#user.id + '-' + #pageNumber + '-' + #pageSize")
     public Page<ExerciseDTO> listExercisesOfUser(User user, Integer pageNumber, Integer pageSize) {
         PageRequest pageRequest = PaginationUtils.buildPageRequest(pageNumber, pageSize);
-        Page<Exercise> exercisePage = exerciseRepository.findExercisesByUserId(user.getId(), pageRequest);
+        var page = exerciseRepository.findExercisesByUserId(user.getId(), pageRequest);
 
-        return exercisePage.map(exerciseMapper::exerciseToExerciseDto);
+        String key = user.getId() + "-" + pageNumber + "-" + pageSize;
+        cacheUtils.track(EXERCISE_LIST_CACHE, user.getId(), key);
+
+        return page.map(exerciseMapper::exerciseToExerciseDto);
     }
-
-    // TODO: fix cache
 }
