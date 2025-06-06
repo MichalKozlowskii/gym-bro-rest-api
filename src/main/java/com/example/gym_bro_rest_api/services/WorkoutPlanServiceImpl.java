@@ -100,8 +100,10 @@ public class WorkoutPlanServiceImpl implements WorkoutPlanService {
         workoutPlan.getExercises().clear();
         workoutPlan.getExercises().addAll(exercises);
 
-        workoutPlan.getSetsReps().clear();
-        workoutPlan.getSetsReps().addAll(workoutPlanDTO.getSetsReps());
+        if (workoutPlanDTO.getSetsReps() != null) {
+            workoutPlan.getSetsReps().clear();
+            workoutPlan.getSetsReps().addAll(workoutPlanDTO.getSetsReps());
+        }
 
         workoutPlanrepository.save(workoutPlan);
 

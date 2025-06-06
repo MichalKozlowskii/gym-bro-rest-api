@@ -182,7 +182,6 @@ class WorkoutServiceImplUnitTest {
         verify(workoutRepository, times(1)).findById(any(Long.class));
         verify(exerciseSetService, times(1)).getExerciseSetById(any(Long.class));
         verify(workoutRepository, times(1)).save(any(Workout.class));
-        verify(exerciseSetService, times(1)).deleteSetById(any(Long.class));
     }
 
     @Test

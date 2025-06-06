@@ -11,6 +11,7 @@ import net.minidev.json.annotate.JsonIgnore;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Builder
@@ -21,7 +22,7 @@ public class WorkoutPlanDTO {
     @NotNull(message = "Name must not be null.")
     private String name;
     private Long userId;
-    private List<ExerciseDTO> exercises;
+    private List<ExerciseDTO> exercises = new ArrayList<>();
     private List<SetsReps> setsReps;
     private LocalDateTime creationDate;
 }

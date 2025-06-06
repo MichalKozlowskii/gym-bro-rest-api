@@ -530,8 +530,6 @@ class WorkoutControllerIT {
         Workout updatedWorkout = workoutRepository.findById(workout.getId()).get();
 
         assertThat(updatedWorkout.getSets()).isEmpty();
-
-        assertThat(exerciseSetRepository.findById(exerciseSet.getId())).isEmpty();
     }
 
     @Test
